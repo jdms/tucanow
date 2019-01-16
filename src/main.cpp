@@ -1,12 +1,14 @@
-#include "main_window.hpp"
+#include <string>
 
-#define WINDOW_WIDTH 600
-#define WINDOW_HEIGHT 600
+#include "main_window.hpp"
 
 
 int main()
 {
-    TucanoGLFWWindow main_window;
+    MainWindow main_window;
+    const int window_width = 600;
+    const int window_height = 600;
+    std::string window_title = "A Simple Phong Viewer";
 
-    return main_window.run(WINDOW_WIDTH, WINDOW_HEIGHT);
+    return main_window.run(window_width, window_height, window_title);
 }

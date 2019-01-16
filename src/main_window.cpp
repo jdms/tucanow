@@ -8,31 +8,34 @@
 #include "main_window.hpp"
 #include "simple_widget.hpp"
 
-/* ModelWidget* widget; */
-/* GLFWwindow* main_window; */
 
-ModelWidget* TucanoGLFWWindow::widget = nullptr;
+std::unique_ptr<SimpleWidget> MainWindow::widget = nullptr;
 
-void TucanoGLFWWindow::initialize (int width, int height)
+void MainWindow::initialize (int width, int height)
 {
     Tucano::Misc::initGlew();
-    widget = new ModelWidget();	
+    widget.reset( new SimpleWidget() );    
     widget->initialize(width, height);
 
     widget->openMeshFile("../samples/models/toy.ply");
 
-    cout << endl << endl << " ************ NEW usage ************** " << endl;
-    cout << "Left mouse button : rotate trackball" << endl;
-    cout << "Right mouse button : translate trackball" << endl;
-    cout << "Midel mouse button : change light direction" << endl;
-    cout << "R : reset trackball and light direction" << endl;
-    cout << " ***************** " << endl;
+    cout << endl << endl;
+    cout << " *********************************************** " << endl;
+    cout << " *** Usage:"                                       << endl;
+    cout << " *********************************************** " << endl;
+    cout << endl;
+    cout << " Left mouse button   : rotate trackball"           << endl;
+    cout << " Right mouse button  : translate trackball"        << endl;
+    cout << " Middle mouse button : change light direction"     << endl;
+    cout << endl;
+    cout << " R : reset trackball and light direction"          << endl;
+    cout << " *********************************************** " << endl;
 }
 
-void TucanoGLFWWindow::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+void MainWindow::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, 1);	
+        glfwSetWindowShouldClose(window, 1);    
     if (key == GLFW_KEY_R && action == GLFW_PRESS)
     {
         widget->getCamera()->reset();
@@ -40,7 +43,7 @@ void TucanoGLFWWindow::keyCallback(GLFWwindow* window, int key, int scancode, in
     }
 }
 
-void TucanoGLFWWindow::mouseButtonCallback (GLFWwindow* window, int button, int action, int mods)
+void MainWindow::mouseButtonCallback (GLFWwindow* window, int button, int action, int mods)
 {
     double xpos, ypos;
     glfwGetCursorPos(window, &xpos, &ypos);
@@ -84,7 +87,7 @@ void TucanoGLFWWindow::mouseButtonCallback (GLFWwindow* window, int button, int 
         }
     }
 }
-void TucanoGLFWWindow::cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
+void MainWindow::cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 {
     if ( widget->getGUI()->cursorMove (xpos, ypos) )
     {
@@ -108,7 +111,7 @@ void TucanoGLFWWindow::cursorPosCallback(GLFWwindow* window, double xpos, double
 
 }
 
-void TucanoGLFWWindow::mouseWheelCallback (GLFWwindow* window, double xoffset, double yoffset)
+void MainWindow::mouseWheelCallback (GLFWwindow* window, double xoffset, double yoffset)
 {
     if (yoffset > 0)
     {
@@ -120,7 +123,7 @@ void TucanoGLFWWindow::mouseWheelCallback (GLFWwindow* window, double xoffset, d
     }
 }
 
-int TucanoGLFWWindow::run(int width, int height, std::string title)
+int MainWindow::run(int width, int height, std::string title)
 {
     if (!glfwInit()) 
     {

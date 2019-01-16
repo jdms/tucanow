@@ -1,6 +1,6 @@
 #include "simple_widget.hpp"
 
-void ModelWidget::initialize (int width, int height)
+void SimpleWidget::initialize (int width, int height)
 {
     // initialize the shader effect (if TUCANOSHADERDIR is set, no need to set dir before init)
     phong.initialize();
@@ -22,10 +22,10 @@ void ModelWidget::initialize (int width, int height)
     gui.add(&menu_button);
 
     int yoffset = 50;
-	groupbox.setPosition (1, 1 + yoffset);
-	groupbox.setDimensions (100, 220);
-	groupbox.setTexture ("../samples/assets/groupbox.pam");
-	gui.add(&groupbox);
+    groupbox.setPosition (1, 1 + yoffset);
+    groupbox.setDimensions (100, 220);
+    groupbox.setTexture ("../samples/assets/groupbox.pam");
+    gui.add(&groupbox);
 
     reload_button.setPosition( 10, 10 + yoffset );
     reload_button.onClick ( [&](){phong.reloadShaders();} );
@@ -85,7 +85,7 @@ void ModelWidget::initialize (int width, int height)
     glEnable(GL_DEPTH_TEST);
 }
 
-void ModelWidget::render (void)
+void SimpleWidget::render (void)
 {
     glClearColor(1.0, 1.0, 1.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -94,12 +94,12 @@ void ModelWidget::render (void)
     gui.render();
 }
 
-void ModelWidget::setShaderDir(std::string dir)
+void SimpleWidget::setShaderDir(std::string dir)
 {
     shader_dir = dir;
 }
 
-void ModelWidget::openMeshFile(std::string fn)
+void SimpleWidget::openMeshFile(std::string fn)
 {
     if (Tucano::MeshImporter::loadPlyFile(&mesh, fn))
     {
@@ -115,7 +115,7 @@ void ModelWidget::openMeshFile(std::string fn)
         }
     }
 }
-void ModelWidget::setModelTexture(std::string tex_file)
+void SimpleWidget::setModelTexture(std::string tex_file)
 {
     Tucano::Texture texture;
     if (Tucano::ImageImporter::loadImage(tex_file, &texture))

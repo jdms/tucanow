@@ -1,5 +1,5 @@
-#ifndef __MODELWIDGET__
-#define __MODELWIDGET__
+#ifndef __SIMPLE_WIDGET__
+#define __SIMPLE_WIDGET__
 
 #include <GL/glew.h>
 
@@ -10,7 +10,7 @@
 #include <tucano/gui/base.hpp>
 
 
-class ModelWidget 
+class SimpleWidget 
 {
 
 private:
@@ -24,7 +24,7 @@ private:
     /// Trackball for manipulating light direction
     Tucano::DirectionalTrackball light;
 
-	string meshFile;
+    string meshFile;
     string shader_dir;
 
     /// Phong effect to render mesh
@@ -33,14 +33,14 @@ private:
     /// GUI holder
     Tucano::GUI::Base gui;
 
-	/// Box to group all gui elements
-	Tucano::GUI::GroupBox groupbox;
+    /// Box to group all gui elements
+    Tucano::GUI::GroupBox groupbox;
 
     /// Reload button
     Tucano::GUI::Button reload_button;
 
-	/// Menu show/hide button
-	Tucano::GUI::SelectButton menu_button;
+    /// Menu show/hide button
+    Tucano::GUI::SelectButton menu_button;
 
     /// Slider for diffuse coefficient
     Tucano::GUI::Slider kd_slider;
@@ -56,7 +56,7 @@ private:
 
 public:
 
-    ModelWidget(void) {}
+    SimpleWidget(void) {}
     
     /**
      * @brief Initializes the widget and shaders
