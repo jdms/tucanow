@@ -55,15 +55,16 @@ private:
     Tucano::GUI::Label shininess_label;
 
 public:
+    SimpleWidget() = default;
 
-    SimpleWidget(void) {}
-    
+    ~SimpleWidget() = default;
+
     /**
      * @brief Initializes the widget and shaders
      * @param width Widget width in pixels
      * @param height Widget height in pixels 
      */
-    void initialize(int width, int height);
+    void initialize(int width, int height, std::string assets_dir = "./samples/assets/");
 
     /**
      * Repaints screen buffer.

@@ -1,10 +1,10 @@
 ###############################################
-# Preliminaries  
+# Preamble  
 ###############################################
 
 cmake_minimum_required(VERSION 3.0)
 
-project(PhongViewer)
+project(MeshViewer)
 
 # For vim's YouCompleteMe plugin
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -22,7 +22,7 @@ find_package(GLEW REQUIRED)
 include_directories(${GLEW_INCLUDE_DIRS})
 link_libraries(${GLEW_LIBRARIES})
 
-# Eigen3 by Tucano
+# Eigen3 is required by Tucano
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIRS})
 
@@ -47,31 +47,45 @@ link_libraries(${GLFW_LIBRARIES})
 
 
 ###############################################
-# Working with the project files
+# Include project's files and build binary
 ###############################################
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -O2") 
+set(CMAKE_CXX_FLAGS 
+    "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -ggdb3") 
 
-set(PHONGVIEWER_DIR "${CMAKE_SOURCE_DIR}") 
+set(MESH_VIEWER_DIR "${CMAKE_SOURCE_DIR}") 
 
-include_directories(${PHONGVIEWER_DIR}/include)
-include_directories(${PHONGVIEWER_DIR}/src/tucano)
+include_directories(${MESH_VIEWER_DIR}/include)
+include_directories(${MESH_VIEWER_DIR}/src)
+include_directories(${MESH_VIEWER_DIR}/src/tucano)
 
-set(PHONGVIEWER_SOURCES
-  ${PHONGVIEWER_DIR}/src/main.cpp
-  ${PHONGVIEWER_DIR}/src/main_window.cpp
-  ${PHONGVIEWER_DIR}/src/simple_widget.cpp
+set(MESH_VIEWER_SOURCES
+    ${MESH_VIEWER_DIR}/src/main.cpp
+    ${MESH_VIEWER_DIR}/src/main_window.cpp
+    ${MESH_VIEWER_DIR}/src/simple_widget.cpp
   )
 
-add_executable(phongViewer ${PHONGVIEWER_SOURCES})
+add_executable(mesh_viewer ${MESH_VIEWER_SOURCES})
 
 
 ###############################################
 # Copy shaders to binary dir when done
 ###############################################
 
-add_custom_command(TARGET phongViewer POST_BUILD 
+add_custom_command(TARGET mesh_viewer POST_BUILD 
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/src/tucano/tucano/effects/shaders 
+    ${MESH_VIEWER_DIR}/src/tucano/tucano/effects/shaders 
         ${CMAKE_CURRENT_BINARY_DIR}/shaders 
+  )
+
+add_custom_command(TARGET mesh_viewer POST_BUILD 
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${MESH_VIEWER_DIR}/src/tucano/samples/assets
+        ${CMAKE_CURRENT_BINARY_DIR}/samples/assets
+  )
+
+add_custom_command(TARGET mesh_viewer POST_BUILD 
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${MESH_VIEWER_DIR}/src/tucano/samples/models
+        ${CMAKE_CURRENT_BINARY_DIR}/samples/models
   )

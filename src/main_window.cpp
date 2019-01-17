@@ -6,18 +6,58 @@
 #include "GLFW/glfw3.h"
 
 #include "main_window.hpp"
+#include "widget_data.hpp"
 #include "simple_widget.hpp"
 
 
+GLFWwindow* MainWindow::main_window = nullptr;
 std::unique_ptr<SimpleWidget> MainWindow::widget = nullptr;
+std::unique_ptr<WidgetData> MainWindow::pdata_ = nullptr;
 
-void MainWindow::initialize (int width, int height)
+MainWindow MainWindow::mw_;
+
+MainWindow::MainWindow()
+{
+    pdata_.reset( new WidgetData() );
+}
+
+MainWindow& MainWindow::Get()
+{
+    return mw_;
+}
+
+bool MainWindow::openMeshFile(std::string filename)
+{
+    if ( filename.empty() )
+    {
+        return false;
+    }
+
+    pdata_->model_filename_ = filename;
+    pdata_->mesh_is_initialized_ = true;
+
+    return true;
+}
+
+bool MainWindow::setAssetsDir(std::string dirname)
+{
+    if ( dirname.empty() )
+    {
+        return false;
+    }
+
+    pdata_->assets_dir_ = dirname;
+
+    return true;
+}
+
+void MainWindow::initialize (int width, int height, WidgetData &data)
 {
     Tucano::Misc::initGlew();
-    widget.reset( new SimpleWidget() );    
-    widget->initialize(width, height);
+    widget.reset( new SimpleWidget() );
+    widget->initialize(width, height, data.assets_dir_);
 
-    widget->openMeshFile("../samples/models/toy.ply");
+    widget->openMeshFile(data.model_filename_);
 
     cout << endl << endl;
     cout << " *********************************************** " << endl;
@@ -38,8 +78,11 @@ void MainWindow::keyCallback(GLFWwindow* window, int key, int scancode, int acti
         glfwSetWindowShouldClose(window, 1);    
     if (key == GLFW_KEY_R && action == GLFW_PRESS)
     {
-        widget->getCamera()->reset();
-        widget->getLight()->reset();
+        if ( widget != nullptr )
+        {
+            widget->getCamera()->reset();
+            widget->getLight()->reset();
+        }
     }
 }
 
@@ -50,63 +93,75 @@ void MainWindow::mouseButtonCallback (GLFWwindow* window, int button, int action
 
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
     {
-        if (widget->getGUI()->leftButtonPressed (xpos, ypos))
-            return;
+        if( widget != nullptr )
+            if (widget->getGUI()->leftButtonPressed (xpos, ypos))
+                return;
     }
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
-        widget->getGUI()->leftButtonReleased (xpos, ypos);
+        if( widget != nullptr )
+            widget->getGUI()->leftButtonReleased (xpos, ypos);
 
 
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
     {
-        widget->getCamera()->rotateCamera( Eigen::Vector2f (xpos, ypos) );
+        if( widget != nullptr )
+            widget->getCamera()->rotateCamera( Eigen::Vector2f (xpos, ypos) );
     }
     else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
     {
-        widget->getCamera()->endRotation();
+        if( widget != nullptr )
+            widget->getCamera()->endRotation();
     }
 
     if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
     {
-        widget->getCamera()->translateCamera(Eigen::Vector2f(xpos, ypos));
+        if( widget != nullptr )
+            widget->getCamera()->translateCamera(Eigen::Vector2f(xpos, ypos));
     }
     else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
     {
-        widget->getCamera()->endTranslation();
+        if( widget != nullptr )
+            widget->getCamera()->endTranslation();
     }
 
     if (button == GLFW_MOUSE_BUTTON_MIDDLE)
     {
         if (action == GLFW_PRESS)
         {
-            widget->getLight()->rotateCamera( Eigen::Vector2f (xpos, ypos) );
+            if( widget != nullptr )
+                widget->getLight()->rotateCamera( Eigen::Vector2f (xpos, ypos) );
         }
         else if (action == GLFW_RELEASE)
         {
-            widget->getLight()->endRotation();
+            if( widget != nullptr )
+                widget->getLight()->endRotation();
         }
     }
 }
 void MainWindow::cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 {
-    if ( widget->getGUI()->cursorMove (xpos, ypos) )
-    {
-        return;
-    }
+    if( widget != nullptr )
+        if ( widget->getGUI()->cursorMove (xpos, ypos) )
+        {
+            return;
+        }
 
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
-    {
-        widget->getCamera()->rotateCamera(Eigen::Vector2f(xpos, ypos));
-    }
+    if( widget != nullptr )
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
+        {
+            widget->getCamera()->rotateCamera(Eigen::Vector2f(xpos, ypos));
+        }
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS)
     {
-        widget->getCamera()->translateCamera(Eigen::Vector2f(xpos, ypos));
+        if( widget != nullptr )
+            widget->getCamera()->translateCamera(Eigen::Vector2f(xpos, ypos));
     }
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_3) == GLFW_PRESS)
     {
-        widget->getLight()->rotateCamera(Eigen::Vector2f(xpos, ypos));
+        if( widget != nullptr )
+            widget->getLight()->rotateCamera(Eigen::Vector2f(xpos, ypos));
     }
 
 }
@@ -115,16 +170,30 @@ void MainWindow::mouseWheelCallback (GLFWwindow* window, double xoffset, double 
 {
     if (yoffset > 0)
     {
-        widget->getCamera()->increaseZoom(1.05);
+        if( widget != nullptr )
+            widget->getCamera()->increaseZoom(1.05);
     }
     else if (yoffset < 0)
     {
-        widget->getCamera()->increaseZoom(1.0/1.05);
+        if( widget != nullptr )
+            widget->getCamera()->increaseZoom(1.0/1.05);
     }
 }
 
 int MainWindow::run(int width, int height, std::string title)
 {
+    if ( main_window )
+    {
+        std::cerr << "MainWindow::run() has already been run" << std::endl;
+        return 3;
+    }
+
+    if ( !pdata_->mesh_is_initialized_ )
+    {
+        std::cerr << "Failed to get a mesh" << std::endl;
+        return 2;
+    }
+
     if (!glfwInit()) 
     {
         std::cerr << "Failed to init glfw" << std::endl;
@@ -133,6 +202,7 @@ int MainWindow::run(int width, int height, std::string title)
 
     // double x dimension for splitview and add margin
     /* main_window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "TUCANO :: Flythrough Camera", NULL, NULL); */
+
     main_window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
     if (!main_window)
     {
@@ -157,15 +227,17 @@ int MainWindow::run(int width, int height, std::string title)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    initialize(width, height);
+    initialize(width, height, *pdata_);
     glfwMakeContextCurrent(main_window);
-    widget->render();
+    if( widget != nullptr )
+        widget->render();
     glfwSwapBuffers( main_window );
 
     while (!glfwWindowShouldClose(main_window))
     {
         glfwMakeContextCurrent(main_window);
-        widget->render();
+        if( widget != nullptr )
+            widget->render();
         glfwSwapBuffers( main_window );
 
         glfwPollEvents();
