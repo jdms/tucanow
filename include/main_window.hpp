@@ -58,7 +58,7 @@ class MainWindow
         static void mouseWheelCallback (GLFWwindow* window, double xoffset, double yoffset);
 
         static GLFWwindow* main_window; ///< Points to memory managed by glfw3
-        static std::unique_ptr<SimpleWidget> widget; ///< Cannot be initialized before glew
+        static std::unique_ptr<SimpleWidget> widget; ///< Must be initialized after glew
 
         /// Protected ctor for singleton pattern
         MainWindow();
