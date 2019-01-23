@@ -12,18 +12,19 @@
 
 GLFWwindow* MainWindow::main_window = nullptr;
 std::unique_ptr<SimpleWidget> MainWindow::widget = nullptr;
-std::unique_ptr<WidgetData> MainWindow::pdata_ = nullptr;
+/* std::unique_ptr<WidgetData> MainWindow::pdata_ = nullptr; */
 
-MainWindow MainWindow::mw_;
 
-MainWindow::MainWindow()
+MainWindow::MainWindow() : pdata_( new WidgetData() )
 {
-    pdata_.reset( new WidgetData() );
+    /* pdata_.reset( new WidgetData() ); */
 }
 
 MainWindow& MainWindow::Get()
 {
-    return mw_;
+    // This is based on Scott Meyers' singleton pattern
+    static MainWindow single_instance;
+    return single_instance;
 }
 
 bool MainWindow::openMeshFile(std::string filename)
@@ -59,17 +60,17 @@ void MainWindow::initialize (int width, int height, WidgetData &data)
 
     widget->openMeshFile(data.model_filename_);
 
-    cout << endl << endl;
-    cout << " *********************************************** " << endl;
-    cout << " *** Usage:"                                       << endl;
-    cout << " *********************************************** " << endl;
-    cout << endl;
-    cout << " Left mouse button   : rotate trackball"           << endl;
-    cout << " Right mouse button  : translate trackball"        << endl;
-    cout << " Middle mouse button : change light direction"     << endl;
-    cout << endl;
-    cout << " R : reset trackball and light direction"          << endl;
-    cout << " *********************************************** " << endl;
+    std::cout << std::endl << std::endl;
+    std::cout << " *********************************************** " << std::endl;
+    std::cout << " *** Usage:"                                       << std::endl;
+    std::cout << " *********************************************** " << std::endl;
+    std::cout << std::endl;
+    std::cout << " Left mouse button   : rotate trackball"           << std::endl;
+    std::cout << " Right mouse button  : translate trackball"        << std::endl;
+    std::cout << " Middle mouse button : change light direction"     << std::endl;
+    std::cout << std::endl;
+    std::cout << " R : reset trackball and light direction"          << std::endl;
+    std::cout << " *********************************************** " << std::endl;
 }
 
 void MainWindow::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -138,6 +139,7 @@ void MainWindow::mouseButtonCallback (GLFWwindow* window, int button, int action
         }
     }
 }
+
 void MainWindow::cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 {
     if( widget != nullptr )

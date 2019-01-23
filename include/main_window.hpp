@@ -20,17 +20,17 @@ class MainWindow
         /// Default dtor
         ~MainWindow() = default;
 
-        /// Default copy ctor
-        MainWindow(MainWindow &) = default;
+        /// Deleted default copy ctor
+        MainWindow(MainWindow &) = delete;
 
-        /// Default copy assigment
-        MainWindow& operator=(const MainWindow &) = default;
+        /// Deleted default copy assigment
+        MainWindow& operator=(const MainWindow &) = delete;
 
-        /// Default move ctor
-        MainWindow(MainWindow &&) = default;
+        /// Deleted default move ctor
+        MainWindow(MainWindow &&) = delete;
 
-        /// Default move assigment
-        MainWindow& operator=(MainWindow &&) = default;
+        /// Deleted default move assigment
+        MainWindow& operator=(MainWindow &&) = delete;
 
         /// Set name of PLY mesh to be visualized
         bool openMeshFile(std::string name);
@@ -60,12 +60,11 @@ class MainWindow
         static GLFWwindow* main_window; ///< Points to memory managed by glfw3
         static std::unique_ptr<SimpleWidget> widget; ///< Must be initialized after glew
 
-        /// Protected ctor for singleton pattern
-        MainWindow();
-
     private: 
-        static MainWindow mw_;
-        static std::unique_ptr<WidgetData> pdata_;
+        std::unique_ptr<WidgetData> pdata_;
+
+        /// Private ctor for singleton pattern
+        MainWindow();
 };
 
 #endif
