@@ -35,7 +35,7 @@ namespace Shapes
 
 /// Default fragment shader for rendering sphere
 const string sphere_fragment_code = "\n"
-        "#version 430\n"
+        "#version 410\n"
         "in vec4 color;\n"
 		"in vec3 normal;\n"
 		"in vec4 vert;\n"
@@ -58,7 +58,7 @@ const string sphere_fragment_code = "\n"
 
 /// Default vertex shader for rendering sphere
 const string sphere_vertex_code = "\n"
-        "#version 430\n"
+        "#version 410\n"
 		"in vec4 in_Position;\n"
         "out vec4 color;\n"
 		"out vec3 normal;\n"
