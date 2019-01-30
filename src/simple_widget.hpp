@@ -13,6 +13,9 @@
 #include<string>
 #include<vector>
 
+
+struct TucanoWidgetImpl;
+
 class SimpleWidget 
 {
 public:
@@ -128,7 +131,6 @@ public:
     void stopRotateLight();
 
 private:
-    struct TucanoWidgetImpl;
     std::unique_ptr<TucanoWidgetImpl> pimpl;
 
     /* /// Mesh to be rendered in this widget */

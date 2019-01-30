@@ -13,9 +13,7 @@
 #include "simple_widget.hpp"
 
 
-
-
-struct SimpleWidget::TucanoWidgetImpl {
+struct TucanoWidgetImpl {
     /// Mesh to be rendered in this widget
     Tucano::Mesh mesh;
 
@@ -37,6 +35,6 @@ struct SimpleWidget::TucanoWidgetImpl {
     enum class MeshType { NONE, FROM_VECTORS, FROM_FILE } mesh_t = MeshType::NONE;
 };
 
-using MeshType = SimpleWidget::TucanoWidgetImpl::MeshType;
+using MeshType = TucanoWidgetImpl::MeshType;
 
 #endif
