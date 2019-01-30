@@ -1,44 +1,64 @@
+#include "tucano_widget_impl.hpp"
 #include "simple_widget.hpp"
+
+
+SimpleWidget::SimpleWidget() : pimpl(new TucanoWidgetImpl)
+{}
+
+SimpleWidget::~SimpleWidget() = default;
+
+SimpleWidget::SimpleWidget(SimpleWidget &&) = default;
+SimpleWidget& SimpleWidget::operator=(SimpleWidget &&) = default;
 
 /* void SimpleWidget::initialize(int width, int height, std::string assets_dir /1* = "../samples/assets/" *1/) */
 void SimpleWidget::initialize(int width, int height)
 {
+    if ( width < 1 )
+        width = 1;
+
+    if ( height < 1 )
+        height = 1;
+
     // initialize the shader effect (if TUCANOSHADERDIR is set, no need to set dir before init)
-    phong.initialize();
+    pimpl->phong.initialize();
 
-    camera.setPerspectiveMatrix(60.0, (float)width/(float)height, 0.1f, 100.0f);
-    camera.setRenderFlag(false);
-    camera.setViewport(Eigen::Vector2f ((float)width, (float)height));
+    pimpl->camera.setPerspectiveMatrix(60.0, (float)width/(float)height, 0.1f, 100.0f);
+    pimpl->camera.setRenderFlag(false);
+    pimpl->camera.setViewport(Eigen::Vector2f ((float)width, (float)height));
 
-    light.setRenderFlag(false);
-    light.setViewport(Eigen::Vector2f ((float)width, (float)height));
+    pimpl->light.setRenderFlag(false);
+    pimpl->light.setViewport(Eigen::Vector2f ((float)width, (float)height));
 
     glEnable(GL_DEPTH_TEST);
 }
 
 void SimpleWidget::render(void)
 {
-    glClearColor(1.0, 1.0, 1.0, 0.0);
+    glClearColor(
+            pimpl->clear_color[0], 
+            pimpl->clear_color[1], 
+            pimpl->clear_color[2],
+            pimpl->clear_color[3]
+        );
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-    phong.render(mesh, camera, light);
-    camera.render();
+
+    pimpl->phong.render(pimpl->mesh, pimpl->camera, pimpl->light);
+    pimpl->camera.render();
 }
 
 void SimpleWidget::setShaderDir(std::string dir)
 {
-    shader_dir = dir;
+    pimpl->shader_dir = dir;
 }
 
-bool SimpleWidget::setDefaultColor(float r, float g, float b)
+void SimpleWidget::setClearColor(float r, float g, float b, float a)
 {
-    phong.setDefaultColor(Eigen::Vector4f(r, g, b, 1.0f));
-
-    return true;
+    pimpl->clear_color = Eigen::Vector4f(r, g, b, a);
 }
 
 bool SimpleWidget::setDefaultColor(float r, float g, float b, float a)
 {
-    phong.setDefaultColor(Eigen::Vector4f(r, g, b, a));
+    pimpl->phong.setDefaultColor(Eigen::Vector4f(r, g, b, a));
 
     return true;
 }
@@ -56,27 +76,27 @@ bool SimpleWidget::setMesh(const std::vector<float> &vertices, const std::vector
         return false;
     }
 
-    if ( mesh_t != MeshType::NONE )
+    if ( pimpl->mesh_t != MeshType::NONE )
     {
-        mesh.reset();
+        pimpl->mesh.reset();
     }
 
-    bool success = mesh.loadVertices(vertices);
+    bool success = pimpl->mesh.loadVertices(vertices);
 
     if ( success && !indices.empty() )
     {
-        mesh.loadIndices(indices);
+        pimpl->mesh.loadIndices(indices);
     }
 
     if ( success && !vertex_normals.empty() )
     {
-        mesh.loadNormals(vertex_normals);
+        pimpl->mesh.loadNormals(vertex_normals);
     }
 
     if ( success )
     {
-        mesh.normalizeModelMatrix();
-        mesh_t = MeshType::FROM_VECTORS;
+        pimpl->mesh.normalizeModelMatrix();
+        pimpl->mesh_t = MeshType::FROM_VECTORS;
     }
 
     return success;
@@ -84,9 +104,9 @@ bool SimpleWidget::setMesh(const std::vector<float> &vertices, const std::vector
 
 /* bool SimpleWidget::setVertices(std::vector<float> &vertices) */
 /* { */
-/*     if ( mesh_t != MeshType::NONE ) */
+/*     if ( pimpl->mesh_t != MeshType::NONE ) */
 /*     { */
-/*         mesh.reset(); */
+/*         pimpl->mesh.reset(); */
 /*     } */
 
 /*     if ( vertices.empty() ) */
@@ -94,10 +114,10 @@ bool SimpleWidget::setMesh(const std::vector<float> &vertices, const std::vector
 /*         return false; */
 /*     } */
 
-/*     bool success = mesh.loadVertices(vertices); */
+/*     bool success = pimpl->mesh.loadVertices(vertices); */
 /*     if ( success ) */
 /*     { */
-/*         mesh.normalizeModelMatrix(); */
+/*         pimpl->mesh.normalizeModelMatrix(); */
 /*         mesh_t = MeshType::FROM_VECTORS; */
 /*     } */
 
@@ -116,7 +136,7 @@ bool SimpleWidget::setMesh(const std::vector<float> &vertices, const std::vector
 /*         return false; */
 /*     } */
 
-/*     mesh.loadIndices(indices); */
+/*     pimpl->mesh.loadIndices(indices); */
 
 /*     return true; */
 /* } */
@@ -133,33 +153,33 @@ bool SimpleWidget::setMesh(const std::vector<float> &vertices, const std::vector
 /*         return false; */
 /*     } */
 
-/*     return mesh.loadNormals(normals); */
+/*     return pimpl->mesh.loadNormals(normals); */
 /* } */
 
 
 bool SimpleWidget::setMeshColorsRGB(std::vector<float> &colors)
 {
-    if ( mesh_t != MeshType::FROM_VECTORS )
+    if ( pimpl->mesh_t != MeshType::FROM_VECTORS )
     {
         return false;
     }
 
-    return mesh.loadColorsRGB(colors);
+    return pimpl->mesh.loadColorsRGB(colors);
 }
 
 bool SimpleWidget::setMeshColorsRGBA(std::vector<float> &colors)
 {
-    if ( mesh_t != MeshType::FROM_VECTORS )
+    if ( pimpl->mesh_t != MeshType::FROM_VECTORS )
     {
         return false;
     }
 
-    return mesh.loadColorsRGBA(colors);
+    return pimpl->mesh.loadColorsRGBA(colors);
 }
 
 bool SimpleWidget::setMeshTexCoords(std::vector<float> &texture)
 {
-    if ( mesh_t != MeshType::FROM_VECTORS )
+    if ( pimpl->mesh_t != MeshType::FROM_VECTORS )
     {
         return false;
     }
@@ -169,20 +189,20 @@ bool SimpleWidget::setMeshTexCoords(std::vector<float> &texture)
         return false;
     }
 
-    return mesh.loadTexCoords(texture);
+    return pimpl->mesh.loadTexCoords(texture);
 }
 
 bool SimpleWidget::openMeshFile(std::string filename)
 {
-    if ( mesh_t != MeshType::NONE )
+    if ( pimpl->mesh_t != MeshType::NONE )
     {
-        mesh.reset();
+        pimpl->mesh.reset();
     }
 
-    bool success = Tucano::MeshImporter::loadPlyFile(&mesh, filename);
+    bool success = Tucano::MeshImporter::loadPlyFile(&pimpl->mesh, filename);
     if (success)
     {
-        mesh.normalizeModelMatrix();
+        pimpl->mesh.normalizeModelMatrix();
         std::string tex_file = Tucano::MeshImporter::getPlyTextureFile(filename);
         if (!tex_file.empty())
         {
@@ -193,7 +213,7 @@ bool SimpleWidget::openMeshFile(std::string filename)
             setModelTexture(tex_file_with_dir);
         }
 
-        mesh_t = MeshType::FROM_FILE;
+        pimpl->mesh_t = MeshType::FROM_FILE;
     }
 
     return success;
@@ -205,8 +225,8 @@ bool SimpleWidget::setModelTexture(std::string tex_file)
     bool success = Tucano::ImageImporter::loadImage(tex_file, &texture);
     if (success)
     {        
-        phong.setTexture(texture);
-        phong.getTexture()->setTexParameters( GL_CLAMP, GL_CLAMP, GL_LINEAR, GL_LINEAR );
+        pimpl->phong.setTexture(texture);
+        pimpl->phong.getTexture()->setTexParameters( GL_CLAMP, GL_CLAMP, GL_LINEAR, GL_LINEAR );
     }
 
     return success;
@@ -219,8 +239,8 @@ bool SimpleWidget::setViewport(int width, int height)
         return false;
     }
 
-    camera.setViewport(Eigen::Vector2f((float)width, (float)height));
-    light.setViewport (Eigen::Vector2f((float)width, (float)height));
+    pimpl->camera.setViewport(Eigen::Vector2f((float)width, (float)height));
+    pimpl->light.setViewport (Eigen::Vector2f((float)width, (float)height));
 
     /* gui.setViewportSize (width, height); */
 
@@ -229,46 +249,46 @@ bool SimpleWidget::setViewport(int width, int height)
 
 void SimpleWidget::resetCamera()
 {
-    camera.reset();
-    light.reset();
+    pimpl->camera.reset();
+    pimpl->light.reset();
 }
 
 void SimpleWidget::increaseCameraZoom()
 {
-        camera.increaseZoom(1.05);
+        pimpl->camera.increaseZoom(1.05);
 }
 
 void SimpleWidget::decreaseCameraZoom()
 {
-        camera.increaseZoom(1.0/1.05);
+        pimpl->camera.increaseZoom(1.0/1.05);
 }
 
 void SimpleWidget::rotateCamera(float xpos, float ypos)
 {
-    camera.rotateCamera( Eigen::Vector2f (xpos, ypos) );
+    pimpl->camera.rotateCamera( Eigen::Vector2f (xpos, ypos) );
 }
 
 void SimpleWidget::stopRotateCamera()
 {
-    camera.endRotation();
+    pimpl->camera.endRotation();
 }
 
 void SimpleWidget::translateCamera(float xpos, float ypos)
 {
-    camera.translateCamera( Eigen::Vector2f(xpos, ypos) );
+    pimpl->camera.translateCamera( Eigen::Vector2f(xpos, ypos) );
 }
 
 void SimpleWidget::stopTranslateCamera()
 {
-    camera.endTranslation();
+    pimpl->camera.endTranslation();
 }
 
 void SimpleWidget::rotateLight(float xpos, float ypos)
 {
-    light.rotateCamera( Eigen::Vector2f (xpos, ypos) );
+    pimpl->light.rotateCamera( Eigen::Vector2f (xpos, ypos) );
 }
 
 void SimpleWidget::stopRotateLight()
 {
-    light.endRotation();
+    pimpl->light.endRotation();
 }

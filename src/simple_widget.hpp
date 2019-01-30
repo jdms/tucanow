@@ -1,49 +1,40 @@
 #ifndef __SIMPLE_WIDGET__
 #define __SIMPLE_WIDGET__
 
-#include <GL/glew.h>
+/* #include <GL/glew.h> */
 
-#include <tucano/utils/trackball.hpp>
-#include <tucano/effects/phongshader.hpp>
-#include <tucano/utils/plyimporter.hpp>
-#include <tucano/utils/imageIO.hpp>
-#include <tucano/gui/base.hpp>
+/* #include <tucano/utils/trackball.hpp> */
+/* #include <tucano/effects/phongshader.hpp> */
+/* #include <tucano/utils/plyimporter.hpp> */
+/* #include <tucano/utils/imageIO.hpp> */
+/* #include <tucano/gui/base.hpp> */
 
+#include<memory>
+#include<string>
+#include<vector>
 
 class SimpleWidget 
 {
-
-private:
-    /// Mesh to be rendered in this widget
-    Tucano::Mesh mesh;
-
-    /// Phong effect to render mesh
-    Tucano::Effects::Phong phong;
-
-    /// Trackball for manipulating the camera
-    Tucano::Trackball camera;
-
-    /// Trackball for manipulating light direction
-    Tucano::DirectionalTrackball light;
-
-    /// Path to shader's dir
-    string shader_dir;
-
-    enum class MeshType { NONE, FROM_VECTORS, FROM_FILE } mesh_t = MeshType::NONE;
-
 public:
-    SimpleWidget() = default;
+    SimpleWidget();
+    ~SimpleWidget();
 
-    ~SimpleWidget() = default;
+    SimpleWidget(const SimpleWidget &) = delete;
+    SimpleWidget& operator=(const SimpleWidget &) = delete;
+
+    SimpleWidget(SimpleWidget &&);
+    SimpleWidget& operator=(SimpleWidget &&);
 
     /**
      * @brief Initializes the widget and shaders
      *
-     * @param width Widget width in pixels
-     * @param height Widget height in pixels 
+     * Must be called after Glew has been initialized
+     *
+     * @param viewport width in pixels
+     * @param viewport height in pixels 
      */
-    /* void initialize(int width, int height, std::string assets_dir = "./samples/assets/"); */
     void initialize(int width, int height);
+    /* void initialize(int width, int height, std::string assets_dir = "./samples/assets/"); */
 
     /**
      * Repaints screen buffer.
@@ -55,10 +46,10 @@ public:
     *
     * @return pointer to trackball camera
     **/
-    Tucano::Trackball* getCamera (void)
-    {
-        return &camera;
-    }
+    /* Tucano::Trackball* getCamera (void) */
+    /* { */
+    /*     return &camera; */
+    /* } */
 
 
     /**
@@ -75,14 +66,14 @@ public:
     *
     * @return pointer to trackball light
     **/
-    Tucano::DirectionalTrackball* getLight (void)
-    {
-        return &light;
-    }
+    /* Tucano::DirectionalTrackball* getLight (void) */
+    /* { */
+    /*     return &light; */
+    /* } */
 
-    bool setDefaultColor(float r, float g, float b);
+    void setClearColor(float r, float g, float b, float a = 0.0f);
 
-    bool setDefaultColor(float r, float g, float b, float a);
+    bool setDefaultColor(float r, float g, float b, float a = 0.0f);
 
     /* bool setVertices(std::vector<float> &vertices); */
 
@@ -107,14 +98,14 @@ public:
      *
      * @param Name of file to open
      */
-    bool openMeshFile(string filename);
+    bool openMeshFile(std::string filename);
 
     /**
      * @brief Set path for the shader's dir
      * @param Path to shader's dir
      */
 
-    void setShaderDir(string dir);
+    void setShaderDir(std::string dir);
 
     /**
      * @brief Sets a texture for the model
@@ -136,7 +127,24 @@ public:
     void rotateLight(float xpos, float ypos);
     void stopRotateLight();
 
+private:
+    struct TucanoWidgetImpl;
+    std::unique_ptr<TucanoWidgetImpl> pimpl;
 
+    /* /// Mesh to be rendered in this widget */
+    /* Tucano::Mesh mesh; */
+
+    /* /// Phong effect to render mesh */
+    /* Tucano::Effects::Phong phong; */
+
+    /* /// Trackball for manipulating the camera */
+    /* Tucano::Trackball camera; */
+
+    /* /// Trackball for manipulating light direction */
+    /* Tucano::DirectionalTrackball light; */
+
+    /* /// Path to shader's dir */
+    /* string shader_dir; */
 };
 
 #endif // MODELWIDGET

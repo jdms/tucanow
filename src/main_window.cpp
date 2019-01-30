@@ -1,7 +1,8 @@
 #include <iostream>
 
 /* Must include Tucano before GLFW or else gets 'gl.h' included before 'glew.h' error */
-#include <tucano/tucano.hpp>
+/* #include <tucano/tucano.hpp> */
+#include <GL/glew.h>
 
 #include "GLFW/glfw3.h"
 
@@ -52,9 +53,23 @@ bool MainWindow::setAssetsDir(std::string dirname)
     return true;
 }
 
+void initGlew()
+{
+
+    glewExperimental = true;
+    GLenum glewInitResult = glewInit();
+    if (GLEW_OK != glewInitResult)
+    {
+        std::cerr << "Error: " << glewGetErrorString(glewInitResult) << std::endl;
+        exit(EXIT_FAILURE);
+    }
+}
+
 void MainWindow::initialize (int width, int height, WidgetData &data)
 {
-    Tucano::Misc::initGlew();
+    /* Tucano::Misc::initGlew(); */
+    initGlew();
+    
     widget.reset( new SimpleWidget() );
     /* widget->initialize(width, height, data.assets_dir_); */
     widget->initialize(width, height);
