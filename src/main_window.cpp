@@ -56,7 +56,8 @@ void MainWindow::initialize (int width, int height, WidgetData &data)
 {
     Tucano::Misc::initGlew();
     widget.reset( new SimpleWidget() );
-    widget->initialize(width, height, data.assets_dir_);
+    /* widget->initialize(width, height, data.assets_dir_); */
+    widget->initialize(width, height);
 
     widget->openMeshFile(data.model_filename_);
 
@@ -95,12 +96,16 @@ void MainWindow::mouseButtonCallback (GLFWwindow* window, int button, int action
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
     {
         if( widget != nullptr )
-            if (widget->getGUI()->leftButtonPressed (xpos, ypos))
+        {
+            /* if (widget->getGUI()->leftButtonPressed (xpos, ypos)) */
                 return;
+        }
     }
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
         if( widget != nullptr )
-            widget->getGUI()->leftButtonReleased (xpos, ypos);
+        {
+            /* widget->getGUI()->leftButtonReleased (xpos, ypos); */
+        }
 
 
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
@@ -143,10 +148,10 @@ void MainWindow::mouseButtonCallback (GLFWwindow* window, int button, int action
 void MainWindow::cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 {
     if( widget != nullptr )
-        if ( widget->getGUI()->cursorMove (xpos, ypos) )
-        {
-            return;
-        }
+        /* if ( widget->getGUI()->cursorMove (xpos, ypos) ) */
+        /* { */
+            /* return; */
+        /* } */
 
     if( widget != nullptr )
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)

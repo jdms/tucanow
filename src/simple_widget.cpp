@@ -1,97 +1,27 @@
 #include "simple_widget.hpp"
 
-void SimpleWidget::initialize (int width, int height, std::string assets_dir /* = "../samples/assets/" */)
+/* void SimpleWidget::initialize(int width, int height, std::string assets_dir /1* = "../samples/assets/" *1/) */
+void SimpleWidget::initialize(int width, int height)
 {
     // initialize the shader effect (if TUCANOSHADERDIR is set, no need to set dir before init)
     phong.initialize();
 
     camera.setPerspectiveMatrix(60.0, (float)width/(float)height, 0.1f, 100.0f);
-    camera.setRenderFlag(true);
+    camera.setRenderFlag(false);
     camera.setViewport(Eigen::Vector2f ((float)width, (float)height));
 
     light.setRenderFlag(false);
     light.setViewport(Eigen::Vector2f ((float)width, (float)height));
 
-    gui.setViewportSize (width, height);
-
-    menu_button.setPosition( 10, 10 );
-    menu_button.onClick ( [&](){groupbox.toggleDisplay();} );
-    menu_button.setTexture ( assets_dir + "menu_button.pam" );
-    //menu_button.setHoverTexture ( assets_dir + "reload_button.pam" );
-    menu_button.setDimensionsFromHeight(30);
-    gui.add(&menu_button);
-
-    int yoffset = 50;
-    groupbox.setPosition (1, 1 + yoffset);
-    groupbox.setDimensions (100, 220);
-    groupbox.setTexture (assets_dir + "groupbox.pam");
-    gui.add(&groupbox);
-
-    reload_button.setPosition( 10, 10 + yoffset );
-    reload_button.onClick ( [&](){phong.reloadShaders();} );
-    reload_button.setTexture ( assets_dir + "reload_button.pam" );
-    reload_button.setDimensionsFromHeight(30);
-    groupbox.add(&reload_button);
-
-    diffuse_label.setPosition(10, 50 + yoffset);
-    diffuse_label.setTexture(assets_dir + "label_diffuse.pam");
-    diffuse_label.setDimensionsFromHeight(12);
-    groupbox.add(&diffuse_label);
-
-    kd_slider.setPosition(10, 70 + yoffset);
-    kd_slider.setDimensions(80, 10);
-    kd_slider.onValueChanged( [&](float v){phong.setDiffuseCoeff(v);} );
-    kd_slider.setTexture(assets_dir + "slider_bar.pam", assets_dir + "slider.pam");
-    kd_slider.moveSlider(phong.getDiffuseCoeff());
-    groupbox.add(&kd_slider);
-
-    specular_label.setPosition(10, 90 + yoffset);
-    specular_label.setTexture(assets_dir + "label_specular.pam");
-    specular_label.setDimensionsFromHeight(12);
-    groupbox.add(&specular_label);
-
-    ks_slider.setPosition(10, 110 + yoffset);
-    ks_slider.setDimensions(80, 10);
-    ks_slider.onValueChanged( [&](float v){phong.setSpecularCoeff(v);} );
-    ks_slider.setTexture(assets_dir + "slider_bar.pam", assets_dir + "slider.pam");
-    ks_slider.moveSlider(phong.getSpecularCoeff());
-    groupbox.add(&ks_slider);
-
-    shininess_label.setPosition(10, 130 + yoffset);
-    shininess_label.setTexture(assets_dir + "label_shininess.pam");
-    shininess_label.setDimensionsFromHeight(12);
-    groupbox.add(&shininess_label);
-
-    shininess_slider.setPosition(10, 150 + yoffset);
-    shininess_slider.setDimensions(80, 10);
-    shininess_slider.onValueChanged( [&](float v){phong.setShininessCoeff(v);} );
-    shininess_slider.setTexture(assets_dir + "slider_bar.pam", assets_dir + "slider.pam");
-    shininess_slider.setMinMaxValues(1.0, 100.0);
-    shininess_slider.moveSlider(phong.getShininessCoeff());
-    groupbox.add(&shininess_slider);
-
-    ambient_label.setPosition(10, 170 + yoffset);
-    ambient_label.setTexture(assets_dir + "label_ambient.pam");
-    ambient_label.setDimensionsFromHeight(12);
-    groupbox.add(&ambient_label);
-
-    ka_slider.setPosition(10, 190 + yoffset);
-    ka_slider.setDimensions(80, 10);
-    ka_slider.onValueChanged( [&](float v){phong.setAmbientCoeff(v);} );
-    ka_slider.setTexture(assets_dir + "slider_bar.pam", assets_dir + "slider.pam");
-    ka_slider.moveSlider(phong.getAmbientCoeff());
-    groupbox.add(&ka_slider);
-
     glEnable(GL_DEPTH_TEST);
 }
 
-void SimpleWidget::render (void)
+void SimpleWidget::render(void)
 {
     glClearColor(1.0, 1.0, 1.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     phong.render(mesh, camera, light);
     camera.render();
-    gui.render();
 }
 
 void SimpleWidget::setShaderDir(std::string dir)
@@ -99,29 +29,186 @@ void SimpleWidget::setShaderDir(std::string dir)
     shader_dir = dir;
 }
 
-void SimpleWidget::openMeshFile(std::string fn)
+bool SimpleWidget::setDefaultColor(float r, float g, float b)
 {
-    if (Tucano::MeshImporter::loadPlyFile(&mesh, fn))
+    phong.setDefaultColor(Eigen::Vector4f(r, g, b, 1.0f));
+
+    return true;
+}
+
+bool SimpleWidget::setDefaultColor(float r, float g, float b, float a)
+{
+    phong.setDefaultColor(Eigen::Vector4f(r, g, b, a));
+
+    return true;
+}
+
+bool SimpleWidget::setMesh(const std::vector<float> &vertices, const std::vector<GLuint> &indices, const std::vector<float> &vertex_normals)
+{
+    if ( !vertex_normals.empty() )
+    if ( vertices.size() != vertex_normals.size() )
+    {
+        return false;
+    }
+    
+    if ( vertices.empty() )
+    {
+        return false;
+    }
+
+    if ( mesh_t != MeshType::NONE )
+    {
+        mesh.reset();
+    }
+
+    bool success = mesh.loadVertices(vertices);
+
+    if ( success && !indices.empty() )
+    {
+        mesh.loadIndices(indices);
+    }
+
+    if ( success && !vertex_normals.empty() )
+    {
+        mesh.loadNormals(vertex_normals);
+    }
+
+    if ( success )
     {
         mesh.normalizeModelMatrix();
-        std::string tex_file = Tucano::MeshImporter::getPlyTextureFile(fn);
+        mesh_t = MeshType::FROM_VECTORS;
+    }
+
+    return success;
+}
+
+/* bool SimpleWidget::setVertices(std::vector<float> &vertices) */
+/* { */
+/*     if ( mesh_t != MeshType::NONE ) */
+/*     { */
+/*         mesh.reset(); */
+/*     } */
+
+/*     if ( vertices.empty() ) */
+/*     { */
+/*         return false; */
+/*     } */
+
+/*     bool success = mesh.loadVertices(vertices); */
+/*     if ( success ) */
+/*     { */
+/*         mesh.normalizeModelMatrix(); */
+/*         mesh_t = MeshType::FROM_VECTORS; */
+/*     } */
+
+/*     return success; */
+/* } */
+
+/* bool SimpleWidget::setIndices(std::vector<unsigned int> &indices) */
+/* { */
+/*     if ( mesh_t != MeshType::FROM_VECTORS ) */
+/*     { */
+/*         return false; */
+/*     } */
+
+/*     if ( indices.empty() ) */
+/*     { */
+/*         return false; */
+/*     } */
+
+/*     mesh.loadIndices(indices); */
+
+/*     return true; */
+/* } */
+
+/* bool SimpleWidget::setNormals(std::vector<float> &normals) */
+/* { */
+/*     if ( mesh_t != MeshType::FROM_VECTORS ) */
+/*     { */
+/*         return false; */
+/*     } */
+
+/*     if ( normals.empty() ) */
+/*     { */
+/*         return false; */
+/*     } */
+
+/*     return mesh.loadNormals(normals); */
+/* } */
+
+
+bool SimpleWidget::setMeshColorsRGB(std::vector<float> &colors)
+{
+    if ( mesh_t != MeshType::FROM_VECTORS )
+    {
+        return false;
+    }
+
+    return mesh.loadColorsRGB(colors);
+}
+
+bool SimpleWidget::setMeshColorsRGBA(std::vector<float> &colors)
+{
+    if ( mesh_t != MeshType::FROM_VECTORS )
+    {
+        return false;
+    }
+
+    return mesh.loadColorsRGBA(colors);
+}
+
+bool SimpleWidget::setMeshTexCoords(std::vector<float> &texture)
+{
+    if ( mesh_t != MeshType::FROM_VECTORS )
+    {
+        return false;
+    }
+
+    if ( texture.empty() )
+    {
+        return false;
+    }
+
+    return mesh.loadTexCoords(texture);
+}
+
+bool SimpleWidget::openMeshFile(std::string filename)
+{
+    if ( mesh_t != MeshType::NONE )
+    {
+        mesh.reset();
+    }
+
+    bool success = Tucano::MeshImporter::loadPlyFile(&mesh, filename);
+    if (success)
+    {
+        mesh.normalizeModelMatrix();
+        std::string tex_file = Tucano::MeshImporter::getPlyTextureFile(filename);
         if (!tex_file.empty())
         {
-            size_t found = fn.find_last_of("/\\");
-            string dir = fn.substr(0, found);
+            size_t found = filename.find_last_of("/\\");
+            string dir = filename.substr(0, found);
             string tex_file_with_dir = dir + "/" + tex_file;
  
             setModelTexture(tex_file_with_dir);
         }
+
+        mesh_t = MeshType::FROM_FILE;
     }
+
+    return success;
 }
-void SimpleWidget::setModelTexture(std::string tex_file)
+
+bool SimpleWidget::setModelTexture(std::string tex_file)
 {
     Tucano::Texture texture;
-    if (Tucano::ImageImporter::loadImage(tex_file, &texture))
+    bool success = Tucano::ImageImporter::loadImage(tex_file, &texture);
+    if (success)
     {        
         phong.setTexture(texture);
         phong.getTexture()->setTexParameters( GL_CLAMP, GL_CLAMP, GL_LINEAR, GL_LINEAR );
     }
+
+    return success;
 }
 

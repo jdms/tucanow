@@ -14,9 +14,11 @@ class SimpleWidget
 {
 
 private:
-
     /// Mesh to be rendered in this widget
     Tucano::Mesh mesh;
+
+    /// Phong effect to render mesh
+    Tucano::Effects::Phong phong;
 
     /// Trackball for manipulating the camera
     Tucano::Trackball camera;
@@ -24,35 +26,10 @@ private:
     /// Trackball for manipulating light direction
     Tucano::DirectionalTrackball light;
 
-    string meshFile;
+    /// Path to shader's dir
     string shader_dir;
 
-    /// Phong effect to render mesh
-    Tucano::Effects::Phong phong;
-
-    /// GUI holder
-    Tucano::GUI::Base gui;
-
-    /// Box to group all gui elements
-    Tucano::GUI::GroupBox groupbox;
-
-    /// Reload button
-    Tucano::GUI::Button reload_button;
-
-    /// Menu show/hide button
-    Tucano::GUI::SelectButton menu_button;
-
-    /// Slider for diffuse coefficient
-    Tucano::GUI::Slider kd_slider;
-    Tucano::GUI::Slider ks_slider;
-    Tucano::GUI::Slider ka_slider;
-    Tucano::GUI::Slider shininess_slider;
-
-    /// Label for diffuse text
-    Tucano::GUI::Label diffuse_label;
-    Tucano::GUI::Label specular_label;
-    Tucano::GUI::Label ambient_label;
-    Tucano::GUI::Label shininess_label;
+    enum class MeshType { NONE, FROM_VECTORS, FROM_FILE } mesh_t = MeshType::NONE;
 
 public:
     SimpleWidget() = default;
@@ -61,10 +38,12 @@ public:
 
     /**
      * @brief Initializes the widget and shaders
+     *
      * @param width Widget width in pixels
      * @param height Widget height in pixels 
      */
-    void initialize(int width, int height, std::string assets_dir = "./samples/assets/");
+    /* void initialize(int width, int height, std::string assets_dir = "./samples/assets/"); */
+    void initialize(int width, int height);
 
     /**
      * Repaints screen buffer.
@@ -73,6 +52,7 @@ public:
 
     /**
     * @brief Returns a pointer to the camera instance
+    *
     * @return pointer to trackball camera
     **/
     Tucano::Trackball* getCamera (void)
@@ -85,13 +65,14 @@ public:
      * @brief Returns pointer to GUI
      * @return pointer to GUI
      */
-    Tucano::GUI::Base* getGUI (void)
-    {
-        return &gui;
-    }
+    /* Tucano::GUI::Base* getGUI (void) */
+    /* { */
+    /*     return &gui; */
+    /* } */
 
     /**
     * @brief Returns a pointer to the light instance
+    *
     * @return pointer to trackball light
     **/
     Tucano::DirectionalTrackball* getLight (void)
@@ -99,17 +80,38 @@ public:
         return &light;
     }
 
-    /**
-     * @brief setMeshFile
-     * @param fn
-     * New function to setup a meshFile var
-     */
-    void openMeshFile(string fn);
+    bool setDefaultColor(float r, float g, float b);
+
+    bool setDefaultColor(float r, float g, float b, float a);
+
+    /* bool setVertices(std::vector<float> &vertices); */
+
+    /* bool setIndices(std::vector<unsigned int> &indices); */
+
+    /* bool setNormals(std::vector<float> &normals); */
+
+    bool setMesh(
+            const std::vector<float> &vertices, 
+            const std::vector<unsigned int> &indices = {}, 
+            const std::vector<float> &vertex_normals = {}
+            );
+
+    bool setMeshColorsRGB(std::vector<float> &colors);
+
+    bool setMeshColorsRGBA(std::vector<float> &colors);
+
+    bool setMeshTexCoords(std::vector<float> &texture);
 
     /**
-     * @brief setShaderDir
-     * @param dir
-     * New function to setup a shaderVar
+     * @brief Open a Ply mesh file
+     *
+     * @param Name of file to open
+     */
+    bool openMeshFile(string filename);
+
+    /**
+     * @brief Set path for the shader's dir
+     * @param Path to shader's dir
      */
 
     void setShaderDir(string dir);
@@ -120,7 +122,7 @@ public:
      * Mesh must have tex coords to work properly
      * @param tex_file Texture filename
      */
-    void setModelTexture(std::string tex_file);
+    bool setModelTexture(std::string tex_file);
 
 };
 
