@@ -57,6 +57,9 @@ class MainWindow
         /// glfw3 callback
         static void mouseWheelCallback (GLFWwindow* window, double xoffset, double yoffset);
 
+        /// glfw3 callback
+        static void framebufferResizeCallback(GLFWwindow *window, int width, int height);
+
         static GLFWwindow* main_window; ///< Points to memory managed by glfw3
         static std::unique_ptr<SimpleWidget> widget; ///< Must be initialized after glew
 

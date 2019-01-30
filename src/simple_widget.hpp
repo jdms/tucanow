@@ -122,6 +122,19 @@ public:
      */
     void setModelTexture(std::string tex_file);
 
+    bool setViewport(int width, int height);
+
+    void resetCamera();
+    void increaseCameraZoom();
+    void decreaseCameraZoom();
+    void rotateCamera(float xpos, float ypos);
+    void stopRotateCamera();
+    void translateCamera(float xpos, float ypos);
+    void stopTranslateCamera();
+    void rotateLight(float xpos, float ypos);
+    void stopRotateLight();
+
+
 };
 
 #endif // MODELWIDGET

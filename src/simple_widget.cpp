@@ -125,3 +125,63 @@ void SimpleWidget::setModelTexture(std::string tex_file)
     }
 }
 
+bool SimpleWidget::setViewport(int width, int height)
+{
+    if ( ( width < 1 ) || ( height < 1 ) )
+    {
+        return false;
+    }
+
+    camera.setViewport(Eigen::Vector2f((float)width, (float)height));
+    light.setViewport (Eigen::Vector2f((float)width, (float)height));
+
+    gui.setViewportSize (width, height);
+
+    return true;
+}
+
+void SimpleWidget::resetCamera()
+{
+    camera.reset();
+    light.reset();
+}
+
+void SimpleWidget::increaseCameraZoom()
+{
+        camera.increaseZoom(1.05);
+}
+
+void SimpleWidget::decreaseCameraZoom()
+{
+        camera.increaseZoom(1.0/1.05);
+}
+
+void SimpleWidget::rotateCamera(float xpos, float ypos)
+{
+    camera.rotateCamera( Eigen::Vector2f (xpos, ypos) );
+}
+
+void SimpleWidget::stopRotateCamera()
+{
+    camera.endRotation();
+}
+
+void SimpleWidget::translateCamera(float xpos, float ypos)
+{
+    camera.translateCamera( Eigen::Vector2f(xpos, ypos) );
+}
+
+void SimpleWidget::stopTranslateCamera()
+{
+    camera.endTranslation();
+}
+
+void SimpleWidget::rotateLight(float xpos, float ypos)
+{
+    light.rotateCamera( Eigen::Vector2f (xpos, ypos) );
+}
+
+void SimpleWidget::stopRotateLight()
+{
+    light.endRotation();
+}

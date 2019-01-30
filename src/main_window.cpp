@@ -77,13 +77,13 @@ void MainWindow::keyCallback(GLFWwindow* window, int key, int scancode, int acti
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, 1);    
+
+    if ( widget == nullptr )
+        return;
+
     if (key == GLFW_KEY_R && action == GLFW_PRESS)
     {
-        if ( widget != nullptr )
-        {
-            widget->getCamera()->reset();
-            widget->getLight()->reset();
-        }
+        widget->resetCamera();
     }
 }
 
@@ -92,94 +92,99 @@ void MainWindow::mouseButtonCallback (GLFWwindow* window, int button, int action
     double xpos, ypos;
     glfwGetCursorPos(window, &xpos, &ypos);
 
+    if( widget == nullptr )
+        return;
+
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
     {
-        if( widget != nullptr )
-            if (widget->getGUI()->leftButtonPressed (xpos, ypos))
-                return;
+        if (widget->getGUI()->leftButtonPressed (xpos, ypos))
+            return;
     }
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
-        if( widget != nullptr )
-            widget->getGUI()->leftButtonReleased (xpos, ypos);
 
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
+    {
+        widget->getGUI()->leftButtonReleased (xpos, ypos);
+    }
 
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
     {
-        if( widget != nullptr )
-            widget->getCamera()->rotateCamera( Eigen::Vector2f (xpos, ypos) );
+        widget->rotateCamera(xpos, ypos);
     }
     else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
     {
-        if( widget != nullptr )
-            widget->getCamera()->endRotation();
+        widget->stopRotateCamera();
     }
 
     if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
     {
-        if( widget != nullptr )
-            widget->getCamera()->translateCamera(Eigen::Vector2f(xpos, ypos));
+        widget->translateCamera(xpos, ypos);
     }
     else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
     {
-        if( widget != nullptr )
-            widget->getCamera()->endTranslation();
+        widget->stopTranslateCamera();
     }
 
     if (button == GLFW_MOUSE_BUTTON_MIDDLE)
     {
         if (action == GLFW_PRESS)
         {
-            if( widget != nullptr )
-                widget->getLight()->rotateCamera( Eigen::Vector2f (xpos, ypos) );
+            widget->rotateLight(xpos, ypos);
         }
         else if (action == GLFW_RELEASE)
         {
-            if( widget != nullptr )
-                widget->getLight()->endRotation();
+            widget->stopRotateLight();
         }
     }
 }
 
 void MainWindow::cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 {
-    if( widget != nullptr )
-        if ( widget->getGUI()->cursorMove (xpos, ypos) )
-        {
-            return;
-        }
+    if( widget == nullptr )
+        return;
 
-    if( widget != nullptr )
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
-        {
-            widget->getCamera()->rotateCamera(Eigen::Vector2f(xpos, ypos));
-        }
+    if ( widget->getGUI()->cursorMove (xpos, ypos) )
+    {
+        return;
+    }
+
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
+    {
+        widget->rotateCamera(xpos, ypos);
+    }
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS)
     {
-        if( widget != nullptr )
-            widget->getCamera()->translateCamera(Eigen::Vector2f(xpos, ypos));
+        widget->translateCamera(xpos, ypos);
     }
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_3) == GLFW_PRESS)
     {
-        if( widget != nullptr )
-            widget->getLight()->rotateCamera(Eigen::Vector2f(xpos, ypos));
+        widget->rotateLight(xpos, ypos);
     }
 
 }
 
 void MainWindow::mouseWheelCallback (GLFWwindow* window, double xoffset, double yoffset)
 {
+    if( widget == nullptr )
+        return;
+
     if (yoffset > 0)
     {
-        if( widget != nullptr )
-            widget->getCamera()->increaseZoom(1.05);
+        widget->increaseCameraZoom();
     }
     else if (yoffset < 0)
     {
-        if( widget != nullptr )
-            widget->getCamera()->increaseZoom(1.0/1.05);
+        widget->decreaseCameraZoom();
     }
+}
+
+void MainWindow::framebufferResizeCallback(GLFWwindow* window, int width, int height)
+{
+    if( widget == nullptr )
+        return;
+
+    widget->setViewport(width, height);
 }
 
 int MainWindow::run(int width, int height, std::string title)
@@ -224,6 +229,8 @@ int MainWindow::run(int width, int height, std::string title)
     glfwSetScrollCallback(main_window, mouseWheelCallback); 
 
     glfwSetInputMode(main_window, GLFW_STICKY_KEYS, true);
+
+    glfwSetFramebufferSizeCallback(main_window, framebufferResizeCallback);
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
