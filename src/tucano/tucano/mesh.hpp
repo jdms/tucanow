@@ -393,7 +393,28 @@ public:
         {
             vertex_attributes[i].disable();
         }
- 
+        vertex_attributes.clear();
+
+        /// Shape matrix holds information about intrinsic scaling of other affine transformation of the object
+        shape_matrix = Eigen::Affine3f::Identity();
+
+        /// Model matrix, holds information about the models location and orientation.
+        model_matrix = Eigen::Affine3f::Identity();
+
+        /// Center of the mesh object.
+        objectCenter = Eigen::Vector3f::Zero();
+
+        /// Object's centroid (different from center of bounding box)
+        centroid = Eigen::Vector3f::Zero();
+
+        /// Radius of the mesh bounding sphere.
+        radius = 1.0;
+
+        /// The normalization scale factor, scales the model matrix to fit the model inside a unit cube.
+        normalization_scale = 1.0;
+
+        /// Default color
+        default_color = Eigen::Vector4f (0.7, 0.7, 0.7, 1.0);
     }
 
     /**
@@ -458,24 +479,12 @@ protected:
 		throw logic_error( "Trying to unmap vertex attribute before instancing it." );
 	}
 
-public:
-
     /**
-     * @brief Load vertices (x,y,z,w) and creates appropriate vertex attribute.
-     * The default attribute name is "in_Position".
-     * Computes bounding box and centroid and normalization factors (normalization_scale).
+     * @brief Computes bounding box and centroid and normalization factors (normalization_scale).
      * @param vert Array of vertices.
      */
-    void loadVertices (vector<Eigen::Vector4f> &vert)
+    void processVertices(const vector<Eigen::Vector4f> &vert)
     {
-
-        numberOfVertices = vert.size();
-
-        // creates new attribute and load vertex coordinates
-        createAttribute("in_Position", vert);
-
-        // from now on we are just computing some information about the model such as bounding box, centroid ...
-
         float xMax = 0; float xMin = 0; float yMax = 0; float yMin = 0; float zMax = 0; float zMin = 0;
 
         int temp = 0;
@@ -531,7 +540,131 @@ public:
         }
 
         normalization_scale = 1.0/radius;
+    }
 
+    /**
+     * @brief Computes bounding box and centroid and normalization factors (normalization_scale).
+     * @param vert Array of vertices.
+     */
+    void processVertices3(const vector<float> &vert)
+    {
+        float xMax = 0; float xMin = 0; float yMax = 0; float yMin = 0; float zMax = 0; float zMin = 0;
+        centroid = Eigen::Vector3f::Zero();
+
+        for(unsigned int i = 0; i < numberOfVertices; ++i) {
+
+            //X:
+            if(vert[3*i + 0] > xMax) {
+                xMax = vert[3*i + 0];
+            }
+            if(vert[3*i + 0] < xMin) {
+                xMin = vert[3*i + 0];
+            }
+
+            //Y:
+            if(vert[3*i + 1] > yMax) {
+                yMax = vert[3*i + 1];
+            }
+            if(vert[3*i + 1] < yMin) {
+                yMin = vert[3*i + 1];
+            }
+
+            //Z:
+            if(vert[3*i + 2] > zMax) {
+                zMax = vert[3*i + 2];
+            }
+            if(vert[3*i + 2] < zMin) {
+                zMin = vert[3*i + 2];
+            }
+
+            //centroid:
+            centroid = centroid + Eigen::Vector3f(vert[3*i + 0], vert[3*i + 1], vert[3*i + 2]);
+
+        }
+
+        centroid = centroid / numberOfVertices;
+
+        normalization_scale = 1.0/max(max(xMax-xMin, yMax-yMin), zMax-zMin);
+
+        float centerX = (xMax+xMin)/2.0;
+        float centerY = (yMax+yMin)/2.0;
+        float centerZ = (zMax+zMin)/2.0;
+        objectCenter = Eigen::Vector3f(centerX, centerY, centerZ);
+
+        /* // compute the centroid (different from the box center) */
+        /* centroid = Eigen::Vector3f::Zero(); */
+        /* for(unsigned int i = 0; i < numberOfVertices; i++) { */
+        /*     centroid = centroid + Eigen::Vector3f(vert[i + 0], vert[i + 1], vert[i + 2]); */
+        /* } */
+        /* centroid = centroid / numberOfVertices; */
+
+        // compute the radius of the bounding sphere
+        // farthest point from the centroid
+        radius = 0.0;
+        for(unsigned int i = 0; i < numberOfVertices; i++) {
+            radius = max(radius, ( Eigen::Vector3f(vert[i + 0], vert[i + 1], vert[i + 2]) - centroid ).norm());
+        }
+
+        normalization_scale = 1.0/radius;
+    }
+
+public:
+
+    /**
+     * @brief Load vertices (x,y,z,w) and creates appropriate vertex attribute.
+     * The default attribute name is "in_Position".
+     * Computes bounding box and centroid and normalization factors (normalization_scale).
+     * @param vert Array of vertices.
+     */
+    void loadVertices (vector<Eigen::Vector4f> &vert)
+    {
+        std::vector<float> vertices( 3*vert.size() );
+        for (size_t i = 0; i < vert.size(); ++i)
+        {
+            vertices[3*i + 0] = vert[i][0];
+            vertices[3*i + 1] = vert[i][1];
+            vertices[3*i + 2] = vert[i][2];
+        }
+
+        loadVertices(vertices);
+
+        /* numberOfVertices = vert.size(); */
+
+        /* // creates new attribute and load vertex coordinates */
+        /* createAttribute("in_Position", vert); */
+
+        /* // from now on we are just computing some information about the model such as bounding box, centroid ... */
+        /* processVertices(vert); */
+    }
+
+    /**
+     * @brief Load vertices (x,y,z) and creates appropriate vertex attribute.
+     * The default attribute name is "in_Position".
+     * Computes bounding box and centroid and normalization factors (normalization_scale).
+     * @param vert Array of vertices.
+     * @return True if vertices vector is multiple of 3, false otherwise.
+     */
+    bool loadVertices(const vector<float> &vert)
+    {
+        if ( vert.empty() )
+        {
+            return false;
+        }
+
+        if ( vert.size() % 3 != 0 )
+        {
+            return false;
+        }
+
+        numberOfVertices = vert.size()/3;
+
+        // creates new attribute and load vertex coordinates
+        createAttribute3("in_Position", vert);
+
+        // from now on we are just computing some information about the model such as bounding box, centroid ...
+        processVertices3(vert);
+
+        return true;
     }
 
     /**
@@ -543,6 +676,30 @@ public:
         numberOfNormals = norm.size();
 
         createAttribute("in_Normal", norm);
+    }
+
+    /**
+     * @brief Load normals (x,y,z) as a vertex attribute.
+     * @param norm Normals list.
+     * @return True if normals vector is multiple of 3, false otherwise.
+     */
+    bool loadNormals (const vector<float> &norm)
+    {
+        if ( norm.empty() )
+        {
+            return false;
+        }
+
+        if ( norm.size() % 3 != 0 )
+        {
+            return false;
+        }
+
+        numberOfNormals = norm.size()/3;
+
+        createAttribute3("in_Normal", norm);
+
+        return true;
     }
 
     /**
@@ -587,6 +744,64 @@ public:
         }
     }
 
+    /**
+     * @brief Load tex coords (u,v) as a vertex attribute.
+     * Optionally normalizes coords in range [0,1]
+     * @param tex Texture coordinates array.
+     * @param normalize If true normalizes the texcoords in range [0,1], otherwise does not normalize.
+     * @return True if texture vector is multiple of 2, false otherwise.
+     */
+    bool loadTexCoords (const vector<float> &tex, bool normalize = false)
+    {
+        if ( tex.empty() )
+        {
+            return false;
+        }
+
+        if ( tex.size() % 2 != 0 )
+        {
+            return false;
+        }
+
+        numberOfTexCoords = tex.size()/2;
+
+        if (normalize)
+        {
+            /* vector<Eigen::Vector2f> tex_normalized; */
+            vector<float> tex_normalized;
+
+            float texXmax = tex[0 + 0];
+            float texXmin = tex[0 + 0];
+            float texYmax = tex[0 + 1];
+            float texYmin = tex[0 + 1];
+
+            // compute min and max values for x and y
+            for(unsigned int i = 0; i < numberOfTexCoords; ++i)
+            {
+                if (tex[2*i + 0] < texXmin) texXmin = tex[2*i + 0];
+                if (tex[2*i + 0] > texXmax) texXmax = tex[2*i + 0];
+                if (tex[2*i + 1] < texYmin) texYmin = tex[2*i + 1];
+                if (tex[2*i + 1] > texYmax) texYmax = tex[2*i + 1];
+
+            }
+            for(unsigned int i = 0; i < numberOfTexCoords; ++i)
+            {
+                /* tex_normalized.push_back ( Eigen::Vector2f( */
+                                               /* (tex[i + 0] - texXmin) / (texXmax - texXmin), */
+                                           /* (tex[i + 1] - texYmin) / (texYmax - texYmin) ) ); */
+                tex_normalized[2*i + 0] = (tex[2*i + 0] - texXmin) / (texXmax - texXmin);
+                tex_normalized[2*i + 0] = (tex[2*i + 0] - texXmin) / (texXmax - texXmin);
+            }
+            createAttribute2("in_TexCoords", tex_normalized);
+        }
+        else
+        {
+            createAttribute2("in_TexCoords", tex);
+        }
+
+        return true;
+    }
+
 
     /**
      * @brief Load colors (r,g,b,a) as a vertex attribute.
@@ -597,29 +812,100 @@ public:
         createAttribute("in_Color", clrs);
     }
 
+    /**
+     * @brief Load colors (r,g,b,a) as a vertex attribute.
+     * @param clrs Colors array.
+     * @return True if colors vector is multiple of 4, false otherwise.
+     */
+    bool loadColorsRGBA (const vector<float> &clrs)
+    {
+        if ( clrs.empty() )
+        {
+            return false;
+        }
+
+        if ( clrs.size() % 4 != 0 )
+        {
+            return false;
+        }
+
+        createAttribute4("in_Color", clrs);
+
+        return true;
+    }
+
+    /**
+     * @brief Load colors (r,g,b) as a vertex attribute.
+     * @param clrs Colors array.
+     * @return True if colors vector is multiple of 3, false otherwise.
+     */
+    bool loadColorsRGB (const vector<float> &clrs)
+    {
+        if ( clrs.empty() )
+        {
+            return false;
+        }
+
+        if ( clrs.size() % 3 != 0 )
+        {
+            return false;
+        }
+
+        createAttribute3("in_Color", clrs);
+
+        return true;
+    }
+
 
     /**
      * @brief Load indices into indices array
      * @param ind Indices array.
      */
-    void loadIndices (vector<GLuint> &ind)
+    template<typename Integer>
+    bool loadIndices(const vector<Integer> &ind)
+    {
+        if ( ind.empty() )
+        {
+            return false;
+        }
+
+        numberOfElements = ind.size();
+        std::vector<GLuint> indices(numberOfElements);
+
+        for( size_t i = 0; i < numberOfElements; ++i )
+        {
+            indices[i] = static_cast<GLuint>(ind[i]);
+        }
+
+        loadIndices(indices);
+
+        return true;
+    }
+
+
+    /**
+     * @brief Load indices into indices array
+     * @param ind Indices array.
+     */
+    void loadIndices(const vector<GLuint> &ind)
     {
         numberOfElements = ind.size();
 
-        GLuint *indices = new GLuint[ind.size()];
+        /* GLuint *indices = new GLuint[ind.size()]; */
 
-        //Indices:
-        for(unsigned int i = 0; i < ind.size(); i++)
-        {
-            indices[i] = ind[i];
-        }
+        /* //Indices: */
+        /* for(unsigned int i = 0; i < ind.size(); i++) */
+        /* { */
+        /*     indices[i] = ind[i]; */
+        /* } */
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *index_buffer_sptr);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, ind.size()*sizeof(GLuint), indices, GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, ind.size()*sizeof(GLuint), ind.data(), GL_STATIC_DRAW);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-        delete [] indices;
+        /* delete [] indices; */
     }
+
 
 	/**
 	 * @brief Reserve vertex attribute memory in order to fill latter on, with mapVertices().
@@ -809,7 +1095,7 @@ public:
     }
 
     /**
-     * @brief Returns wether an attribute exists or not.
+     * @brief Returns whether an attribute exists or not.
      * @param name Name of attribute to be queried.
      * @return True if attribute exists, false otherwise.
      */
@@ -894,14 +1180,16 @@ public:
      * @param attrib Array with new attribute.
      * @return Pointer to created attribute
      */
-    VertexAttribute* createAttribute (string name, vector<Eigen::Vector4f> &attrib)
+    VertexAttribute* createAttribute(string name, vector<Eigen::Vector4f> &attrib)
     {
-        // create new vertex attribute
-        VertexAttribute va (name, attrib.size(), 4, GL_FLOAT);
+        /* // create new vertex attribute */
+        /* VertexAttribute va (name, attrib.size(), 4, GL_FLOAT); */
 
-        float * attrib_array = new float[va.getSize()*va.getElementSize()];
+        /* float *attrib_array = new float[ va.getSize()*va.getElementSize() ]; */
+        std::vector<float> attrib_array( 4*attrib.size() );
+
         int temp = 0;
-        for(int i = 0; i < va.getSize()*va.getElementSize(); i+=4)
+        for(size_t i = 0; i < 4*attrib.size(); i+=4)
         {
             attrib_array[i] = attrib[temp][0];
             attrib_array[i+1] = attrib[temp][1];
@@ -910,14 +1198,35 @@ public:
             temp++;
         }
 
+        /* // fill buffer with attribute data */
+        /* va.bind(); */
+        /* glBufferData(va.getArrayType(), va.getSize()*va.getElementSize()*va.getTypeSize(), attrib_array, GL_STATIC_DRAW); */
+        /* va.unbind(); */
+
+        /* vertex_attributes.push_back(va); */
+        /* delete [] attrib_array; */
+        /* return &vertex_attributes[vertex_attributes.size()-1]; */
+
+        return createAttribute4(std::move(name), attrib_array);
+    }
+    
+    /**
+     * @brief Creates and loads a new mesh attribute of 4 floats.
+     * @param name Name of the attribute.
+     * @param attrib Array with new attribute.
+     * @return Pointer to created attribute
+     */
+    VertexAttribute* createAttribute4(string name, const vector<float> &attrib)
+    {
+        // create new vertex attribute
+        VertexAttribute va (name, attrib.size()/4, 4, GL_FLOAT);
+
         // fill buffer with attribute data
         va.bind();
-		
-        glBufferData(va.getArrayType(), va.getSize()*va.getElementSize()*va.getTypeSize(), attrib_array, GL_STATIC_DRAW);
+        glBufferData(va.getArrayType(), va.getSize()*va.getElementSize()*va.getTypeSize(), attrib.data(), GL_STATIC_DRAW);
         va.unbind();
 
         vertex_attributes.push_back(va);
-        delete [] attrib_array;
         return &vertex_attributes[vertex_attributes.size()-1];
 
     }
@@ -930,26 +1239,49 @@ public:
      */
     VertexAttribute* createAttribute(string name, vector<Eigen::Vector3f> &attrib)
     {
-        // create new vertex attribute
-        VertexAttribute va (name, attrib.size(), 3, GL_FLOAT);
+        /* // create new vertex attribute */
+        /* VertexAttribute va (name, attrib.size(), 3, GL_FLOAT); */
 
-        float * attrib_array = new float[va.getSize()*va.getElementSize()];
+        /* float *attrib_array = new float[ va.getSize()*va.getElementSize() ]; */
+        std::vector<float> attrib_array( 3*attrib.size() );
 
-        int temp = 0;
-        for(int i = 0; i < va.getSize()*va.getElementSize(); i+=3) {
+        size_t temp = 0;
+        for(size_t i = 0; i < 3*attrib.size(); i+=3) {
             attrib_array[i] = attrib[temp][0];
             attrib_array[i+1] = attrib[temp][1];
             attrib_array[i+2] = attrib[temp][2];
             temp++;
         }
 
+        /* // fill buffer with attribute data */
+        /* va.bind(); */
+        /* glBufferData(va.getArrayType(), va.getSize()*va.getElementSize()*va.getTypeSize(), attrib_array, GL_STATIC_DRAW); */
+        /* va.unbind(); */
+
+        /* vertex_attributes.push_back(va); */
+        /* delete [] attrib_array; */
+        /* return &vertex_attributes[vertex_attributes.size()-1]; */
+
+        return createAttribute3(std::move(name), attrib_array);
+    }
+
+    /**
+     * @brief Creates and loads a new mesh attribute of 3 floats.
+     * @param name Name of the attribute.
+     * @param attrib Array with new attribute.
+     * @return Pointer to created attribute
+     */
+    VertexAttribute* createAttribute3(string name, const vector<float> &attrib)
+    {
+        // create new vertex attribute
+        VertexAttribute va (name, attrib.size()/3, 3, GL_FLOAT);
+
         // fill buffer with attribute data
         va.bind();
-        glBufferData(va.getArrayType(), va.getSize()*va.getElementSize()*va.getTypeSize(), attrib_array, GL_STATIC_DRAW);
+        glBufferData(va.getArrayType(), va.getSize()*va.getElementSize()*va.getTypeSize(), attrib.data(), GL_STATIC_DRAW);
         va.unbind();
 
         vertex_attributes.push_back(va);
-        delete [] attrib_array;
         return &vertex_attributes[vertex_attributes.size()-1];
     }
 
@@ -961,25 +1293,48 @@ public:
      */
     VertexAttribute* createAttribute(string name, vector<Eigen::Vector2f> &attrib)
     {
-        // create new vertex attribute
-        VertexAttribute va (name, attrib.size(), 2, GL_FLOAT);
+        /* // create new vertex attribute */
+        /* VertexAttribute va (name, attrib.size(), 2, GL_FLOAT); */
 
-        float * attrib_array = new float[va.getSize()*va.getElementSize()];
+        /* float * attrib_array = new float[va.getSize()*va.getElementSize()]; */
+        std::vector<float> attrib_array( 2*attrib.size() );
 
-        int temp = 0;
-        for(int i = 0; i < va.getSize()*va.getElementSize(); i+=2) {
+        size_t temp = 0;
+        for(size_t i = 0; i < 2*attrib.size(); i+=2) {
             attrib_array[i] = attrib[temp][0];
             attrib_array[i+1] = attrib[temp][1];
             temp++;
         }
 
+        /* // fill buffer with attribute data */
+        /* va.bind(); */
+        /* glBufferData(va.getArrayType(), va.getSize()*va.getElementSize()*va.getTypeSize(), attrib_array, GL_STATIC_DRAW); */
+        /* va.unbind(); */
+
+        /* vertex_attributes.push_back(va); */
+        /* delete [] attrib_array; */
+        /* return &vertex_attributes[vertex_attributes.size()-1]; */
+
+        return createAttribute2(std::move(name), attrib_array);
+    }
+
+    /**
+     * @brief Creates and loads a new mesh attribute of 2 floats.
+     * @param name Name of the attribute.
+     * @param attrib Array with new attribute.
+     * @return Pointer to created attribute
+     */
+    VertexAttribute* createAttribute2(string name, const vector<float> &attrib)
+    {
+        // create new vertex attribute
+        VertexAttribute va (name, attrib.size()/2, 2, GL_FLOAT);
+
         // fill buffer with attribute data
         va.bind();
-        glBufferData(va.getArrayType(), va.getSize()*va.getElementSize()*va.getTypeSize(), attrib_array, GL_STATIC_DRAW);
+        glBufferData(va.getArrayType(), va.getSize()*va.getElementSize()*va.getTypeSize(), attrib.data(), GL_STATIC_DRAW);
         va.unbind();
 
         vertex_attributes.push_back(va);
-        delete [] attrib_array;
         return &vertex_attributes[vertex_attributes.size()-1];
     }
 
