@@ -28,6 +28,9 @@
 #include <memory>
 
 
+using ulong = unsigned long int;
+
+
 namespace Tucano
 {
 

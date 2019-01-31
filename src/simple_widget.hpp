@@ -20,7 +20,7 @@ class SimpleWidget
 {
 public:
     SimpleWidget();
-    ~SimpleWidget();
+    virtual ~SimpleWidget();
 
     SimpleWidget(const SimpleWidget &) = delete;
     SimpleWidget& operator=(const SimpleWidget &) = delete;

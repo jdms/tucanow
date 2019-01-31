@@ -57,7 +57,7 @@ set(MESH_VIEWER_DIR "${CMAKE_SOURCE_DIR}")
 
 include_directories(${MESH_VIEWER_DIR}/include)
 include_directories(${MESH_VIEWER_DIR}/src)
-include_directories(${MESH_VIEWER_DIR}/src/tucano)
+include_directories(SYSTEM ${MESH_VIEWER_DIR}/src/tucano)
 
 set(MESH_VIEWER_SOURCES
     ${MESH_VIEWER_DIR}/src/main.cpp

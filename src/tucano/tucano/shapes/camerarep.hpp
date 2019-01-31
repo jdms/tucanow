@@ -37,7 +37,7 @@ namespace Shapes
 
 /// Default fragment shader for rendering camera representation.
 const string camerarep_fragment_code = "\n"
-        "#version 430\n"
+        "#version 410\n"
         "in vec4 ex_Color;\n"
         "out vec4 out_Color;\n"
         "in float depth;\n"
@@ -49,7 +49,7 @@ const string camerarep_fragment_code = "\n"
 
 /// Default vertex shader for rendering trackball representation.
 const string camerarep_vertex_code = "\n"
-        "#version 430\n"
+        "#version 410\n"
         "in vec4 in_Position;\n"
         "out vec4 ex_Color;\n"
         "out float depth;\n"

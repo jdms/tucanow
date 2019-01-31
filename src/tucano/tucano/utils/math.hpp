@@ -20,8 +20,8 @@
  * along with Tucano Library.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __MATH__
-#define __MATH__
+#ifndef __TUCANO_MATH__
+#define __TUCANO_MATH__
 
 #include <Eigen/Dense>
 

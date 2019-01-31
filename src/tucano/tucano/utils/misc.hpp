@@ -24,7 +24,10 @@
 #define __MISC__
 
 #include <GL/glew.h>
-#include <GL/glu.h>
+
+#ifndef __APPLE__
+    #include <GL/glu.h>
+#endif
 
 #include <iostream>
 #include <string>
@@ -56,7 +59,11 @@ inline void errorCheckFunc (std::string file, int line, std::string message = ""
     GLenum ErrorCheckValue = glGetError();
     if (ErrorCheckValue != GL_NO_ERROR)
     {
-        std::cerr << "GL error in " << file << "  line " << line << " : " << gluErrorString(ErrorCheckValue) << std::endl;
+        #ifndef __APPLE__
+            std::cerr << "GL error in " << file << "  line " << line << " : " << gluErrorString(ErrorCheckValue) << std::endl;
+        #else
+            std::cerr << "GL error in " << file << "  line " << line << " : " << ErrorCheckValue << std::endl;
+        #endif
         std::cerr << message.c_str() << std::endl;
         exit(EXIT_FAILURE);
     }
