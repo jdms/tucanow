@@ -9,10 +9,12 @@
 #include "main_window.hpp"
 #include "widget_data.hpp"
 #include "simple_widget.hpp"
+#include "tucanow_gui.hpp"
 
 
 GLFWwindow* MainWindow::main_window = nullptr;
 std::unique_ptr<SimpleWidget> MainWindow::widget = nullptr;
+std::unique_ptr<Gui> MainWindow::pgui = nullptr;
 /* std::unique_ptr<WidgetData> MainWindow::pdata_ = nullptr; */
 
 
@@ -71,8 +73,10 @@ void MainWindow::initialize (int width, int height, WidgetData &data)
     initGlew();
     
     widget.reset( new SimpleWidget() );
-    /* widget->initialize(width, height, data.assets_dir_); */
+    pgui.reset( new Gui( *widget ) );
+
     widget->initialize(width, height);
+    pgui->initialize(width, height, data.assets_dir_);
 
     widget->loadPLY(data.model_filename_);
 
@@ -105,12 +109,10 @@ void MainWindow::keyCallback(GLFWwindow* window, int key, int scancode, int acti
 
 void MainWindow::mouseButtonCallback (GLFWwindow* window, int button, int action, int mods)
 {
-    double xpos, ypos;
-    glfwGetCursorPos(window, &xpos, &ypos);
-
     if( widget == nullptr )
         return;
 
+/* <<<<<<< HEAD */
     /* if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) */
     /* { */
     /*     if (widget->getGUI()->leftButtonPressed (xpos, ypos)) */
@@ -121,6 +123,21 @@ void MainWindow::mouseButtonCallback (GLFWwindow* window, int button, int action
     /* { */
         /* widget->getGUI()->leftButtonReleased (xpos, ypos); */
     /* } */
+/* ======= */
+    double xpos, ypos;
+    glfwGetCursorPos(window, &xpos, &ypos);
+
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+    {
+        if ( pgui->leftButtonPressed(xpos, ypos) )
+            return;
+    }
+
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
+    {
+        pgui->leftButtonReleased(xpos, ypos);
+    }
+/* >>>>>>> master */
 
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
     {
@@ -158,10 +175,17 @@ void MainWindow::cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
     if( widget == nullptr )
         return;
 
+/* <<<<<<< HEAD */
     /* if ( widget->getGUI()->cursorMove (xpos, ypos) ) */
     /* { */
     /*     return; */
     /* } */
+/* ======= */
+    if ( pgui->cursorMove(xpos, ypos) )
+    {
+        return;
+    }
+/* >>>>>>> master */
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
     {
@@ -253,6 +277,14 @@ int MainWindow::run(int width, int height, std::string title)
     glfwGetFramebufferSize( main_window, &fb_width, &fb_height );
 
     initialize(fb_width, fb_height, *pdata_);
+    if ( widget != nullptr )
+        if ( (width > 0) && (height > 0) )
+        {
+            widget->setScreenScale( 
+                    static_cast<float>(fb_width)/static_cast<float>(width), 
+                    static_cast<float>(fb_height)/static_cast<float>(height) 
+                    );
+        }
 
     glfwSetKeyCallback(main_window, keyCallback); 
 
@@ -274,7 +306,10 @@ int MainWindow::run(int width, int height, std::string title)
     {
         glfwMakeContextCurrent(main_window);
         if( widget != nullptr )
+        {
             widget->render();
+            pgui->render();
+        }
         glfwSwapBuffers( main_window );
 
         glfwPollEvents();

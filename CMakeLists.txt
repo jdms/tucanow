@@ -63,6 +63,7 @@ set(MESH_VIEWER_SOURCES
     ${MESH_VIEWER_DIR}/src/main.cpp
     ${MESH_VIEWER_DIR}/src/main_window.cpp
     ${MESH_VIEWER_DIR}/src/simple_widget.cpp
+    ${MESH_VIEWER_DIR}/src/tucanow_gui.cpp
   )
 
 add_executable(mesh_viewer ${MESH_VIEWER_SOURCES})

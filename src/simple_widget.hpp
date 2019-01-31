@@ -15,6 +15,7 @@
 
 
 struct TucanoWidgetImpl;
+class Gui;
 
 class SimpleWidget 
 {
@@ -130,8 +131,12 @@ public:
     void rotateLight(float xpos, float ypos);
     void stopRotateLight();
 
+    bool setScreenScale(float scale_width, float scale_height);
+    void getScreenScale(float& scale_width, float& scale_height);
+
 private:
     std::unique_ptr<TucanoWidgetImpl> pimpl;
+    friend class Gui;
 
     /* /// Mesh to be rendered in this widget */
     /* Tucano::Mesh mesh; */
@@ -147,6 +152,9 @@ private:
 
     /* /// Path to shader's dir */
     /* string shader_dir; */
+
+    float scale_width = 1.0f; ///<-- Ratio size(framebuffer_width)/size(window_width)
+    float scale_height = 1.0f; ///<-- Ratio size(framebuffer_height)/size(window_height)
 };
 
 #endif // MODELWIDGET
