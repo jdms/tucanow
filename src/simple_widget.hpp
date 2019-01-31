@@ -54,6 +54,9 @@ private:
     Tucano::GUI::Label ambient_label;
     Tucano::GUI::Label shininess_label;
 
+    float scale_width = 1.0f; ///<-- Ratio size(framebuffer_width)/size(window_width)
+    float scale_height = 1.0f; ///<-- Ratio size(framebuffer_height)/size(window_height)
+
 public:
     SimpleWidget() = default;
 
@@ -134,7 +137,8 @@ public:
     void rotateLight(float xpos, float ypos);
     void stopRotateLight();
 
-
+    bool setScreenScale( float scale_width, float scale_height );
+    void getScreenScale( float& scale_width, float& scale_height );
 };
 
 #endif // MODELWIDGET

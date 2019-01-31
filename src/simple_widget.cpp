@@ -191,3 +191,26 @@ void SimpleWidget::stopRotateLight()
 {
     light.endRotation();
 }
+
+
+bool SimpleWidget::setScreenScale( float swidth, float sheight )
+{
+    bool success = true;
+    success &= swidth > 0;
+    success &= sheight > 0;
+
+    if ( success )
+    {
+        scale_width = swidth;
+        scale_height = sheight;
+    }
+
+    return success;
+}
+
+void SimpleWidget::getScreenScale( float& swidth, float& sheight )
+{
+    swidth = scale_width;
+    sheight = scale_height;
+}
+

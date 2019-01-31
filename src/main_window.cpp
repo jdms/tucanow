@@ -89,21 +89,27 @@ void MainWindow::keyCallback(GLFWwindow* window, int key, int scancode, int acti
 
 void MainWindow::mouseButtonCallback (GLFWwindow* window, int button, int action, int mods)
 {
-    double xpos, ypos;
-    glfwGetCursorPos(window, &xpos, &ypos);
-
     if( widget == nullptr )
         return;
 
+    double xpos, ypos;
+    glfwGetCursorPos(window, &xpos, &ypos);
+
+    float swidth, sheight;
+    widget->getScreenScale(swidth, sheight);
+
+    double scaled_xpos = swidth * xpos;
+    double scaled_ypos = sheight * ypos;
+
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
     {
-        if (widget->getGUI()->leftButtonPressed (xpos, ypos))
+        if (widget->getGUI()->leftButtonPressed (scaled_xpos, scaled_ypos))
             return;
     }
 
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
     {
-        widget->getGUI()->leftButtonReleased (xpos, ypos);
+        widget->getGUI()->leftButtonReleased (scaled_xpos, scaled_ypos);
     }
 
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
@@ -142,7 +148,13 @@ void MainWindow::cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
     if( widget == nullptr )
         return;
 
-    if ( widget->getGUI()->cursorMove (xpos, ypos) )
+    float swidth, sheight;
+    widget->getScreenScale(swidth, sheight);
+
+    double scaled_xpos = swidth * xpos;
+    double scaled_ypos = sheight * ypos;
+
+    if ( widget->getGUI()->cursorMove (scaled_xpos, scaled_ypos) )
     {
         return;
     }
@@ -237,6 +249,14 @@ int MainWindow::run(int width, int height, std::string title)
     glfwGetFramebufferSize( main_window, &fb_width, &fb_height );
 
     initialize(fb_width, fb_height, *pdata_);
+    if ( widget != nullptr )
+        if ( (width > 0) && (height > 0) )
+        {
+            widget->setScreenScale( 
+                    static_cast<float>(fb_width)/static_cast<float>(width), 
+                    static_cast<float>(fb_height)/static_cast<float>(height) 
+                    );
+        }
 
     glfwSetKeyCallback(main_window, keyCallback); 
 
