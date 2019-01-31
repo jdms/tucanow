@@ -57,7 +57,7 @@ private:
 public:
     SimpleWidget() = default;
 
-    ~SimpleWidget() = default;
+    virtual ~SimpleWidget() = default;
 
     /**
      * @brief Initializes the widget and shaders
