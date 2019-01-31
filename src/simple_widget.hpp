@@ -137,8 +137,14 @@ public:
     void rotateLight(float xpos, float ypos);
     void stopRotateLight();
 
-    bool setScreenScale( float scale_width, float scale_height );
-    void getScreenScale( float& scale_width, float& scale_height );
+    bool setScreenScale(float scale_width, float scale_height);
+    void getScreenScale(float& scale_width, float& scale_height);
+
+    void guiInitialize(int width, int height, std::string assets_dir);
+    void guiRender();
+    bool guiLeftButtonPressed(float xpos, float ypos);
+    bool guiLeftButtonReleased(float xpos, float ypos);
+    bool guiCursorMove(float xpos, float ypos);
 };
 
 #endif // MODELWIDGET

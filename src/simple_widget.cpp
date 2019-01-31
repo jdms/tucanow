@@ -12,81 +12,11 @@ void SimpleWidget::initialize (int width, int height, std::string assets_dir /* 
     light.setRenderFlag(false);
     light.setViewport(Eigen::Vector2f ((float)width, (float)height));
 
-    gui.setViewportSize (width, height);
-
     // Manually tuned parameters
     phong.setAmbientCoeff(0.525);
     phong.setDiffuseCoeff(0.75);
     phong.setSpecularCoeff(0.0875);
     phong.setShininessCoeff(3.475);
-
-    menu_button.setPosition( 10, 10 );
-    menu_button.onClick ( [&](){groupbox.toggleDisplay();} );
-    menu_button.setTexture ( assets_dir + "menu_button.pam" );
-    //menu_button.setHoverTexture ( assets_dir + "reload_button.pam" );
-    menu_button.setDimensionsFromHeight(30);
-    gui.add(&menu_button);
-
-    int yoffset = 50;
-    groupbox.setPosition (1, 1 + yoffset);
-    groupbox.setDimensions (100, 220);
-    groupbox.setTexture (assets_dir + "groupbox.pam");
-    gui.add(&groupbox);
-
-    reload_button.setPosition( 10, 10 + yoffset );
-    reload_button.onClick ( [&](){phong.reloadShaders();} );
-    reload_button.setTexture ( assets_dir + "reload_button.pam" );
-    reload_button.setDimensionsFromHeight(30);
-    groupbox.add(&reload_button);
-
-    diffuse_label.setPosition(10, 50 + yoffset);
-    diffuse_label.setTexture(assets_dir + "label_diffuse.pam");
-    diffuse_label.setDimensionsFromHeight(12);
-    groupbox.add(&diffuse_label);
-
-    kd_slider.setPosition(10, 70 + yoffset);
-    kd_slider.setDimensions(80, 10);
-    kd_slider.onValueChanged( [&](float v){phong.setDiffuseCoeff(v); std::cout << "DiffuseCoeff: " << v <<"\n";} );
-    kd_slider.setTexture(assets_dir + "slider_bar.pam", assets_dir + "slider.pam");
-    kd_slider.moveSlider(phong.getDiffuseCoeff());
-    groupbox.add(&kd_slider);
-
-    specular_label.setPosition(10, 90 + yoffset);
-    specular_label.setTexture(assets_dir + "label_specular.pam");
-    specular_label.setDimensionsFromHeight(12);
-    groupbox.add(&specular_label);
-
-    ks_slider.setPosition(10, 110 + yoffset);
-    ks_slider.setDimensions(80, 10);
-    ks_slider.onValueChanged( [&](float v){phong.setSpecularCoeff(v); std::cout << "SpecularCoeff: " << v <<"\n";} );
-    ks_slider.setTexture(assets_dir + "slider_bar.pam", assets_dir + "slider.pam");
-    ks_slider.moveSlider(phong.getSpecularCoeff());
-    groupbox.add(&ks_slider);
-
-    shininess_label.setPosition(10, 130 + yoffset);
-    shininess_label.setTexture(assets_dir + "label_shininess.pam");
-    shininess_label.setDimensionsFromHeight(12);
-    groupbox.add(&shininess_label);
-
-    shininess_slider.setPosition(10, 150 + yoffset);
-    shininess_slider.setDimensions(80, 10);
-    shininess_slider.onValueChanged( [&](float v){phong.setShininessCoeff(v); std::cout << "ShininessCoeff: " << v <<"\n";} );
-    shininess_slider.setTexture(assets_dir + "slider_bar.pam", assets_dir + "slider.pam");
-    shininess_slider.setMinMaxValues(1.0, 100.0);
-    shininess_slider.moveSlider(phong.getShininessCoeff());
-    groupbox.add(&shininess_slider);
-
-    ambient_label.setPosition(10, 170 + yoffset);
-    ambient_label.setTexture(assets_dir + "label_ambient.pam");
-    ambient_label.setDimensionsFromHeight(12);
-    groupbox.add(&ambient_label);
-
-    ka_slider.setPosition(10, 190 + yoffset);
-    ka_slider.setDimensions(80, 10);
-    ka_slider.onValueChanged( [&](float v){phong.setAmbientCoeff(v); std::cout << "AmbientCoeff: " << v <<"\n";} );
-    ka_slider.setTexture(assets_dir + "slider_bar.pam", assets_dir + "slider.pam");
-    ka_slider.moveSlider(phong.getAmbientCoeff());
-    groupbox.add(&ka_slider);
 
     glEnable(GL_DEPTH_TEST);
 }
@@ -97,7 +27,6 @@ void SimpleWidget::render (void)
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     phong.render(mesh, camera, light);
     camera.render();
-    gui.render();
 }
 
 void SimpleWidget::setShaderDir(std::string dir)
@@ -214,3 +143,104 @@ void SimpleWidget::getScreenScale( float& swidth, float& sheight )
     sheight = scale_height;
 }
 
+void SimpleWidget::guiInitialize(int width, int height, std::string assets_dir)
+{
+    gui.setViewportSize (width, height);
+
+    menu_button.setPosition( 10, 10 );
+    menu_button.onClick ( [&](){groupbox.toggleDisplay();} );
+    menu_button.setTexture ( assets_dir + "menu_button.pam" );
+    //menu_button.setHoverTexture ( assets_dir + "reload_button.pam" );
+    menu_button.setDimensionsFromHeight(30);
+    gui.add(&menu_button);
+
+    int yoffset = 50;
+    groupbox.setPosition (1, 1 + yoffset);
+    groupbox.setDimensions (100, 220);
+    groupbox.setTexture (assets_dir + "groupbox.pam");
+    gui.add(&groupbox);
+
+    reload_button.setPosition( 10, 10 + yoffset );
+    reload_button.onClick ( [&](){phong.reloadShaders();} );
+    reload_button.setTexture ( assets_dir + "reload_button.pam" );
+    reload_button.setDimensionsFromHeight(30);
+    groupbox.add(&reload_button);
+
+    diffuse_label.setPosition(10, 50 + yoffset);
+    diffuse_label.setTexture(assets_dir + "label_diffuse.pam");
+    diffuse_label.setDimensionsFromHeight(12);
+    groupbox.add(&diffuse_label);
+
+    kd_slider.setPosition(10, 70 + yoffset);
+    kd_slider.setDimensions(80, 10);
+    kd_slider.onValueChanged( [&](float v){phong.setDiffuseCoeff(v); std::cout << "DiffuseCoeff: " << v <<"\n";} );
+    kd_slider.setTexture(assets_dir + "slider_bar.pam", assets_dir + "slider.pam");
+    kd_slider.moveSlider(phong.getDiffuseCoeff());
+    groupbox.add(&kd_slider);
+
+    specular_label.setPosition(10, 90 + yoffset);
+    specular_label.setTexture(assets_dir + "label_specular.pam");
+    specular_label.setDimensionsFromHeight(12);
+    groupbox.add(&specular_label);
+
+    ks_slider.setPosition(10, 110 + yoffset);
+    ks_slider.setDimensions(80, 10);
+    ks_slider.onValueChanged( [&](float v){phong.setSpecularCoeff(v); std::cout << "SpecularCoeff: " << v <<"\n";} );
+    ks_slider.setTexture(assets_dir + "slider_bar.pam", assets_dir + "slider.pam");
+    ks_slider.moveSlider(phong.getSpecularCoeff());
+    groupbox.add(&ks_slider);
+
+    shininess_label.setPosition(10, 130 + yoffset);
+    shininess_label.setTexture(assets_dir + "label_shininess.pam");
+    shininess_label.setDimensionsFromHeight(12);
+    groupbox.add(&shininess_label);
+
+    shininess_slider.setPosition(10, 150 + yoffset);
+    shininess_slider.setDimensions(80, 10);
+    shininess_slider.onValueChanged( [&](float v){phong.setShininessCoeff(v); std::cout << "ShininessCoeff: " << v <<"\n";} );
+    shininess_slider.setTexture(assets_dir + "slider_bar.pam", assets_dir + "slider.pam");
+    shininess_slider.setMinMaxValues(1.0, 100.0);
+    shininess_slider.moveSlider(phong.getShininessCoeff());
+    groupbox.add(&shininess_slider);
+
+    ambient_label.setPosition(10, 170 + yoffset);
+    ambient_label.setTexture(assets_dir + "label_ambient.pam");
+    ambient_label.setDimensionsFromHeight(12);
+    groupbox.add(&ambient_label);
+
+    ka_slider.setPosition(10, 190 + yoffset);
+    ka_slider.setDimensions(80, 10);
+    ka_slider.onValueChanged( [&](float v){phong.setAmbientCoeff(v); std::cout << "AmbientCoeff: " << v <<"\n";} );
+    ka_slider.setTexture(assets_dir + "slider_bar.pam", assets_dir + "slider.pam");
+    ka_slider.moveSlider(phong.getAmbientCoeff());
+    groupbox.add(&ka_slider);
+}
+
+void SimpleWidget::guiRender()
+{
+    gui.render();
+}
+
+bool SimpleWidget::guiLeftButtonPressed(float xpos, float ypos)
+{
+    double scaled_xpos = scale_width * xpos;
+    double scaled_ypos = scale_height * ypos;
+
+    return gui.leftButtonPressed (scaled_xpos, scaled_ypos);
+}
+
+bool SimpleWidget::guiLeftButtonReleased(float xpos, float ypos)
+{
+    double scaled_xpos = scale_width * xpos;
+    double scaled_ypos = scale_height * ypos;
+
+    return gui.leftButtonReleased (scaled_xpos, scaled_ypos);
+}
+
+bool SimpleWidget::guiCursorMove(float xpos, float ypos)
+{
+    double scaled_xpos = scale_width * xpos;
+    double scaled_ypos = scale_height * ypos;
+
+    return gui.cursorMove (scaled_xpos, scaled_ypos);
+}

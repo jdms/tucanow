@@ -56,7 +56,8 @@ void MainWindow::initialize (int width, int height, WidgetData &data)
 {
     Tucano::Misc::initGlew();
     widget.reset( new SimpleWidget() );
-    widget->initialize(width, height, data.assets_dir_);
+    widget->initialize(width, height);
+    widget->guiInitialize(width, height, data.assets_dir_);
 
     widget->openMeshFile(data.model_filename_);
 
@@ -95,21 +96,15 @@ void MainWindow::mouseButtonCallback (GLFWwindow* window, int button, int action
     double xpos, ypos;
     glfwGetCursorPos(window, &xpos, &ypos);
 
-    float swidth, sheight;
-    widget->getScreenScale(swidth, sheight);
-
-    double scaled_xpos = swidth * xpos;
-    double scaled_ypos = sheight * ypos;
-
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
     {
-        if (widget->getGUI()->leftButtonPressed (scaled_xpos, scaled_ypos))
+        if ( widget->guiLeftButtonPressed(xpos, ypos) )
             return;
     }
 
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
     {
-        widget->getGUI()->leftButtonReleased (scaled_xpos, scaled_ypos);
+        widget->guiLeftButtonReleased(xpos, ypos);
     }
 
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
@@ -148,13 +143,7 @@ void MainWindow::cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
     if( widget == nullptr )
         return;
 
-    float swidth, sheight;
-    widget->getScreenScale(swidth, sheight);
-
-    double scaled_xpos = swidth * xpos;
-    double scaled_ypos = sheight * ypos;
-
-    if ( widget->getGUI()->cursorMove (scaled_xpos, scaled_ypos) )
+    if ( widget->guiCursorMove(xpos, ypos) )
     {
         return;
     }
@@ -278,7 +267,10 @@ int MainWindow::run(int width, int height, std::string title)
     {
         glfwMakeContextCurrent(main_window);
         if( widget != nullptr )
+        {
             widget->render();
+            widget->guiRender();
+        }
         glfwSwapBuffers( main_window );
 
         glfwPollEvents();
