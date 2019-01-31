@@ -5,11 +5,13 @@
 #include <memory>
 #include <string>
 
-
-class SimpleWidget;
 struct GLFWwindow;
 struct WidgetData;
-class Gui;
+
+namespace tucanow {
+    class Scene;
+    class Gui;
+}
 
 /// Create and manage aplication window
 class MainWindow
@@ -62,8 +64,8 @@ class MainWindow
         static void framebufferResizeCallback(GLFWwindow *window, int width, int height);
 
         static GLFWwindow* main_window; ///< Points to memory managed by glfw3
-        static std::unique_ptr<SimpleWidget> widget; ///< Must be initialized after glew
-        static std::unique_ptr<Gui> pgui;
+        static std::unique_ptr<tucanow::Scene> pscene; ///< Must be initialized after glew
+        static std::unique_ptr<tucanow::Gui> pgui;
 
     private: 
         std::unique_ptr<WidgetData> pdata_;

@@ -8,13 +8,14 @@
 
 #include "main_window.hpp"
 #include "widget_data.hpp"
-#include "simple_widget.hpp"
-#include "tucanow_gui.hpp"
+#include "scene.hpp"
+#include "gui.hpp"
+#include "misc.hpp"
 
 
 GLFWwindow* MainWindow::main_window = nullptr;
-std::unique_ptr<SimpleWidget> MainWindow::widget = nullptr;
-std::unique_ptr<Gui> MainWindow::pgui = nullptr;
+std::unique_ptr<tucanow::Scene> MainWindow::pscene = nullptr;
+std::unique_ptr<tucanow::Gui> MainWindow::pgui = nullptr;
 /* std::unique_ptr<WidgetData> MainWindow::pdata_ = nullptr; */
 
 
@@ -55,30 +56,30 @@ bool MainWindow::setAssetsDir(std::string dirname)
     return true;
 }
 
-void initGlew()
-{
+/* void initGlew() */
+/* { */
 
-    glewExperimental = true;
-    GLenum glewInitResult = glewInit();
-    if (GLEW_OK != glewInitResult)
-    {
-        std::cerr << "Error: " << glewGetErrorString(glewInitResult) << std::endl;
-        exit(EXIT_FAILURE);
-    }
-}
+/*     glewExperimental = true; */
+/*     GLenum glewInitResult = glewInit(); */
+/*     if (GLEW_OK != glewInitResult) */
+/*     { */
+/*         std::cerr << "Error: " << glewGetErrorString(glewInitResult) << std::endl; */
+/*         exit(EXIT_FAILURE); */
+/*     } */
+/* } */
 
 void MainWindow::initialize (int width, int height, WidgetData &data)
 {
     /* Tucano::Misc::initGlew(); */
-    initGlew();
+    tucanow::misc::initGlew();
     
-    widget.reset( new SimpleWidget() );
-    pgui.reset( new Gui( *widget ) );
+    pscene.reset( new tucanow::Scene() );
+    pgui.reset( new tucanow::Gui( *pscene ) );
 
-    widget->initialize(width, height);
+    pscene->initialize(width, height);
     pgui->initialize(width, height, data.assets_dir_);
 
-    widget->loadPLY(data.model_filename_);
+    pscene->loadMeshFromPLY(data.model_filename_);
 
     std::cout << std::endl << std::endl;
     std::cout << " *********************************************** " << std::endl;
@@ -98,30 +99,30 @@ void MainWindow::keyCallback(GLFWwindow* window, int key, int scancode, int acti
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, 1);    
 
-    if ( widget == nullptr )
+    if ( pscene == nullptr )
         return;
 
     if (key == GLFW_KEY_R && action == GLFW_PRESS)
     {
-        widget->resetCamera();
+        pscene->resetCamera();
     }
 }
 
 void MainWindow::mouseButtonCallback (GLFWwindow* window, int button, int action, int mods)
 {
-    if( widget == nullptr )
+    if( pscene == nullptr )
         return;
 
 /* <<<<<<< HEAD */
     /* if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) */
     /* { */
-    /*     if (widget->getGUI()->leftButtonPressed (xpos, ypos)) */
+    /*     if (pscene->getGUI()->leftButtonPressed (xpos, ypos)) */
     /*         return; */
     /* } */
 
     /* if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) */
     /* { */
-        /* widget->getGUI()->leftButtonReleased (xpos, ypos); */
+        /* pscene->getGUI()->leftButtonReleased (xpos, ypos); */
     /* } */
 /* ======= */
     double xpos, ypos;
@@ -141,42 +142,42 @@ void MainWindow::mouseButtonCallback (GLFWwindow* window, int button, int action
 
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
     {
-        widget->rotateCamera(xpos, ypos);
+        pscene->rotateCamera(xpos, ypos);
     }
     else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
     {
-        widget->stopRotateCamera();
+        pscene->stopRotateCamera();
     }
 
     if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
     {
-        widget->translateCamera(xpos, ypos);
+        pscene->translateCamera(xpos, ypos);
     }
     else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
     {
-        widget->stopTranslateCamera();
+        pscene->stopTranslateCamera();
     }
 
     if (button == GLFW_MOUSE_BUTTON_MIDDLE)
     {
         if (action == GLFW_PRESS)
         {
-            widget->rotateLight(xpos, ypos);
+            pscene->rotateLight(xpos, ypos);
         }
         else if (action == GLFW_RELEASE)
         {
-            widget->stopRotateLight();
+            pscene->stopRotateLight();
         }
     }
 }
 
 void MainWindow::cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 {
-    if( widget == nullptr )
+    if( pscene == nullptr )
         return;
 
 /* <<<<<<< HEAD */
-    /* if ( widget->getGUI()->cursorMove (xpos, ypos) ) */
+    /* if ( pscene->getGUI()->cursorMove (xpos, ypos) ) */
     /* { */
     /*     return; */
     /* } */
@@ -189,42 +190,43 @@ void MainWindow::cursorPosCallback(GLFWwindow* window, double xpos, double ypos)
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
     {
-        widget->rotateCamera(xpos, ypos);
+        pscene->rotateCamera(xpos, ypos);
     }
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS)
     {
-        widget->translateCamera(xpos, ypos);
+        pscene->translateCamera(xpos, ypos);
     }
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_3) == GLFW_PRESS)
     {
-        widget->rotateLight(xpos, ypos);
+        pscene->rotateLight(xpos, ypos);
     }
 
 }
 
 void MainWindow::mouseWheelCallback (GLFWwindow* window, double xoffset, double yoffset)
 {
-    if( widget == nullptr )
+    if( pscene == nullptr )
         return;
 
     if (yoffset > 0)
     {
-        widget->increaseCameraZoom();
+        pscene->increaseCameraZoom();
     }
     else if (yoffset < 0)
     {
-        widget->decreaseCameraZoom();
+        pscene->decreaseCameraZoom();
     }
 }
 
 void MainWindow::framebufferResizeCallback(GLFWwindow* window, int width, int height)
 {
-    if( widget == nullptr )
+    if( pscene == nullptr )
         return;
 
-    widget->setViewport(width, height);
+    pscene->setViewport(width, height);
+    pgui->setViewport(width, height);
 }
 
 int MainWindow::run(int width, int height, std::string title)
@@ -277,10 +279,10 @@ int MainWindow::run(int width, int height, std::string title)
     glfwGetFramebufferSize( main_window, &fb_width, &fb_height );
 
     initialize(fb_width, fb_height, *pdata_);
-    if ( widget != nullptr )
+    if ( pscene != nullptr )
         if ( (width > 0) && (height > 0) )
         {
-            widget->setScreenScale( 
+            pscene->setScreenScale( 
                     static_cast<float>(fb_width)/static_cast<float>(width), 
                     static_cast<float>(fb_height)/static_cast<float>(height) 
                     );
@@ -298,16 +300,16 @@ int MainWindow::run(int width, int height, std::string title)
 
     glfwSetFramebufferSizeCallback(main_window, framebufferResizeCallback);
 
-    if( widget != nullptr )
-        widget->render();
+    if( pscene != nullptr )
+        pscene->render();
     glfwSwapBuffers( main_window );
 
     while (!glfwWindowShouldClose(main_window))
     {
         glfwMakeContextCurrent(main_window);
-        if( widget != nullptr )
+        if( pscene != nullptr )
         {
-            widget->render();
+            pscene->render();
             pgui->render();
         }
         glfwSwapBuffers( main_window );

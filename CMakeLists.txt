@@ -51,7 +51,7 @@ link_libraries(${GLFW_LIBRARIES})
 ###############################################
 
 set(CMAKE_CXX_FLAGS 
-    "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -O2") 
+    "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -ggdb3") 
 
 set(MESH_VIEWER_DIR "${CMAKE_SOURCE_DIR}") 
 
@@ -62,8 +62,8 @@ include_directories(SYSTEM ${MESH_VIEWER_DIR}/src/tucano)
 set(MESH_VIEWER_SOURCES
     ${MESH_VIEWER_DIR}/src/main.cpp
     ${MESH_VIEWER_DIR}/src/main_window.cpp
-    ${MESH_VIEWER_DIR}/src/simple_widget.cpp
-    ${MESH_VIEWER_DIR}/src/tucanow_gui.cpp
+    ${MESH_VIEWER_DIR}/src/scene.cpp
+    ${MESH_VIEWER_DIR}/src/gui.cpp
   )
 
 add_executable(mesh_viewer ${MESH_VIEWER_SOURCES})

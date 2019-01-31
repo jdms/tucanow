@@ -1,17 +1,20 @@
-#include "tucano_widget_impl.hpp"
-#include "simple_widget.hpp"
+#include "scene_impl.hpp"
+#include "scene.hpp"
 
 
-SimpleWidget::SimpleWidget() : pimpl(new TucanoWidgetImpl)
+namespace tucanow {
+
+
+Scene::Scene() : pimpl(new SceneImpl)
 {}
 
-SimpleWidget::~SimpleWidget() = default;
+Scene::~Scene() = default;
 
-SimpleWidget::SimpleWidget(SimpleWidget &&) = default;
-SimpleWidget& SimpleWidget::operator=(SimpleWidget &&) = default;
+Scene::Scene(Scene &&) = default;
+Scene& Scene::operator=(Scene &&) = default;
 
-/* void SimpleWidget::initialize(int width, int height, std::string assets_dir /1* = "../samples/assets/" *1/) */
-void SimpleWidget::initialize(int width, int height)
+/* void Scene::initialize(int width, int height, std::string assets_dir /1* = "../samples/assets/" *1/) */
+void Scene::initialize(int width, int height)
 {
     if ( width < 1 )
         width = 1;
@@ -38,7 +41,7 @@ void SimpleWidget::initialize(int width, int height)
     glEnable(GL_DEPTH_TEST);
 }
 
-void SimpleWidget::render(void)
+void Scene::render(void)
 {
     glClearColor(
             pimpl->clear_color[0], 
@@ -52,17 +55,17 @@ void SimpleWidget::render(void)
     pimpl->camera.render();
 }
 
-void SimpleWidget::setShaderDir(std::string dir)
-{
-    pimpl->shader_dir = dir;
-}
+/* void Scene::setShaderDir(std::string dir) */
+/* { */
+/*     pimpl->shader_dir = dir; */
+/* } */
 
-void SimpleWidget::setClearColor(float r, float g, float b, float a)
+void Scene::setClearColor(float r, float g, float b, float a)
 {
     pimpl->clear_color = Eigen::Vector4f(r, g, b, a);
 }
 
-bool SimpleWidget::setMesh(const std::vector<float> &vertices, const std::vector<GLuint> &indices, const std::vector<float> &vertex_normals)
+bool Scene::setMesh(const std::vector<float> &vertices, const std::vector<GLuint> &indices, const std::vector<float> &vertex_normals)
 {
     if ( !vertex_normals.empty() )
     if ( vertices.size() != vertex_normals.size() )
@@ -101,7 +104,7 @@ bool SimpleWidget::setMesh(const std::vector<float> &vertices, const std::vector
     return success;
 }
 
-/* bool SimpleWidget::setVertices(std::vector<float> &vertices) */
+/* bool Scene::setVertices(std::vector<float> &vertices) */
 /* { */
 /*     if ( pimpl->mesh_t != MeshType::NONE ) */
 /*     { */
@@ -123,7 +126,7 @@ bool SimpleWidget::setMesh(const std::vector<float> &vertices, const std::vector
 /*     return success; */
 /* } */
 
-/* bool SimpleWidget::setIndices(std::vector<unsigned int> &indices) */
+/* bool Scene::setIndices(std::vector<unsigned int> &indices) */
 /* { */
 /*     if ( mesh_t != MeshType::FROM_VECTORS ) */
 /*     { */
@@ -140,7 +143,7 @@ bool SimpleWidget::setMesh(const std::vector<float> &vertices, const std::vector
 /*     return true; */
 /* } */
 
-/* bool SimpleWidget::setNormals(std::vector<float> &normals) */
+/* bool Scene::setNormals(std::vector<float> &normals) */
 /* { */
 /*     if ( mesh_t != MeshType::FROM_VECTORS ) */
 /*     { */
@@ -155,7 +158,7 @@ bool SimpleWidget::setMesh(const std::vector<float> &vertices, const std::vector
 /*     return pimpl->mesh.loadNormals(normals); */
 /* } */
 
-bool SimpleWidget::setMeshColor(float r, float g, float b, float a)
+bool Scene::setMeshColor(float r, float g, float b, float a)
 {
     /* pimpl->phong.setMeshColor(Eigen::Vector4f(r, g, b, a)); */
     pimpl->mesh.setColor(Eigen::Vector4f(r, g, b, a));
@@ -164,7 +167,7 @@ bool SimpleWidget::setMeshColor(float r, float g, float b, float a)
 }
 
 
-bool SimpleWidget::setMeshColorsRGB(std::vector<float> &colors)
+bool Scene::setMeshColorsRGB(std::vector<float> &colors)
 {
     if ( pimpl->mesh_t != MeshType::FROM_VECTORS )
     {
@@ -174,7 +177,7 @@ bool SimpleWidget::setMeshColorsRGB(std::vector<float> &colors)
     return pimpl->mesh.loadColorsRGB(colors);
 }
 
-bool SimpleWidget::setMeshColorsRGBA(std::vector<float> &colors)
+bool Scene::setMeshColorsRGBA(std::vector<float> &colors)
 {
     if ( pimpl->mesh_t != MeshType::FROM_VECTORS )
     {
@@ -184,7 +187,7 @@ bool SimpleWidget::setMeshColorsRGBA(std::vector<float> &colors)
     return pimpl->mesh.loadColorsRGBA(colors);
 }
 
-bool SimpleWidget::setMeshTexCoords(std::vector<float> &texture)
+bool Scene::setMeshTexCoords(std::vector<float> &texture)
 {
     if ( pimpl->mesh_t != MeshType::FROM_VECTORS )
     {
@@ -199,7 +202,7 @@ bool SimpleWidget::setMeshTexCoords(std::vector<float> &texture)
     return pimpl->mesh.loadTexCoords(texture);
 }
 
-bool SimpleWidget::loadPLY(std::string filename)
+bool Scene::loadMeshFromPLY(std::string filename)
 {
     if ( pimpl->mesh_t != MeshType::NONE )
     {
@@ -226,7 +229,7 @@ bool SimpleWidget::loadPLY(std::string filename)
     return success;
 }
 
-bool SimpleWidget::setModelTexture(std::string tex_file)
+bool Scene::setModelTexture(std::string tex_file)
 {
     Tucano::Texture texture;
     bool success = Tucano::ImageImporter::loadImage(tex_file, &texture);
@@ -239,7 +242,7 @@ bool SimpleWidget::setModelTexture(std::string tex_file)
     return success;
 }
 
-bool SimpleWidget::setViewport(int width, int height)
+bool Scene::setViewport(int width, int height)
 {
     if ( ( width < 1 ) || ( height < 1 ) )
     {
@@ -249,59 +252,57 @@ bool SimpleWidget::setViewport(int width, int height)
     pimpl->camera.setViewport(Eigen::Vector2f((float)width, (float)height));
     pimpl->light.setViewport (Eigen::Vector2f((float)width, (float)height));
 
-    /* gui.setViewportSize (width, height); */
-
     return true;
 }
 
-void SimpleWidget::resetCamera()
+void Scene::resetCamera()
 {
     pimpl->camera.reset();
     pimpl->light.reset();
 }
 
-void SimpleWidget::increaseCameraZoom()
+void Scene::increaseCameraZoom()
 {
         pimpl->camera.increaseZoom(1.05);
 }
 
-void SimpleWidget::decreaseCameraZoom()
+void Scene::decreaseCameraZoom()
 {
         pimpl->camera.increaseZoom(1.0/1.05);
 }
 
-void SimpleWidget::rotateCamera(float xpos, float ypos)
+void Scene::rotateCamera(float xpos, float ypos)
 {
     pimpl->camera.rotateCamera( Eigen::Vector2f (xpos, ypos) );
 }
 
-void SimpleWidget::stopRotateCamera()
+void Scene::stopRotateCamera()
 {
     pimpl->camera.endRotation();
 }
 
-void SimpleWidget::translateCamera(float xpos, float ypos)
+void Scene::translateCamera(float xpos, float ypos)
 {
     pimpl->camera.translateCamera( Eigen::Vector2f(xpos, ypos) );
 }
 
-void SimpleWidget::stopTranslateCamera()
+void Scene::stopTranslateCamera()
 {
     pimpl->camera.endTranslation();
 }
 
-void SimpleWidget::rotateLight(float xpos, float ypos)
+void Scene::rotateLight(float xpos, float ypos)
 {
     pimpl->light.rotateCamera( Eigen::Vector2f (xpos, ypos) );
 }
 
-void SimpleWidget::stopRotateLight()
+void Scene::stopRotateLight()
 {
     pimpl->light.endRotation();
 }
 
 
-bool SimpleWidget::setScreenScale( float swidth, float sheight )
+bool Scene::setScreenScale( float swidth, float sheight )
 {
     bool success = true;
     success &= swidth > 0;
@@ -316,8 +317,12 @@ bool SimpleWidget::setScreenScale( float swidth, float sheight )
     return success;
 }
 
-void SimpleWidget::getScreenScale( float& swidth, float& sheight )
+void Scene::getScreenScale( float& swidth, float& sheight )
 {
     swidth = scale_width;
     sheight = scale_height;
 }
+
+} // namespace tucanow
+
+

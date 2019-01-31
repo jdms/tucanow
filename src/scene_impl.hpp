@@ -1,8 +1,8 @@
-#ifndef __TUCANO_WIDGET_IMPL__
-#define __TUCANO_WIDGET_IMPL__
+#ifndef __TUCANOW_SCENE_IMPL__
+#define __TUCANOW_SCENE_IMPL__
 
 
-#include <GL/glew.h>
+/* #include <GL/glew.h> */
 
 #include <tucano/utils/trackball.hpp>
 #include <tucano/effects/phongshader.hpp>
@@ -10,10 +10,14 @@
 #include <tucano/utils/imageIO.hpp>
 #include <tucano/gui/base.hpp>
 
-#include "simple_widget.hpp"
+#include "scene.hpp"
 
 
-struct TucanoWidgetImpl {
+namespace tucanow {
+
+
+struct SceneImpl 
+{
     /// Mesh to be rendered in this widget
     Tucano::Mesh mesh;
 
@@ -35,6 +39,10 @@ struct TucanoWidgetImpl {
     enum class MeshType { NONE, FROM_VECTORS, FROM_FILE } mesh_t = MeshType::NONE;
 };
 
-using MeshType = TucanoWidgetImpl::MeshType;
+using MeshType = SceneImpl::MeshType;
+
+
+} // namespace tucanow
+
 
 #endif

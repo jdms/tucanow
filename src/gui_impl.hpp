@@ -1,30 +1,23 @@
-#ifndef __TUCANOW_GUI
-#define __TUCANOW_GUI
+#ifndef __TUCANOW_GUI_IMPL__
+#define __TUCANOW_GUI_IMPL__
 
-#include <string>
 
-#include "simple_widget.hpp"
+/* #include <GL/glew.h> */
+
 /* #include <tucano/tucano.hpp> */
 /* #include <tucano/utils/trackball.hpp> */
 /* #include <tucano/effects/phongshader.hpp> */
 /* #include <tucano/utils/plyimporter.hpp> */
 /* #include <tucano/utils/imageIO.hpp> */
 #include <tucano/gui/base.hpp>
+#include "scene.hpp"
 
-class Gui {
-    public: 
-        Gui(SimpleWidget &s) : scene(s) {}
-        virtual ~Gui() = default;
 
-        virtual void initialize(int width, int height, std::string assets_dir);
-        virtual void render();
-        virtual bool leftButtonPressed(float xpos, float ypos);
-        virtual bool leftButtonReleased(float xpos, float ypos);
-        virtual bool cursorMove(float xpos, float ypos);
+namespace tucanow {
 
-    private:
-        SimpleWidget& scene;
 
+struct GuiImpl 
+{
         /// GUI holder
         Tucano::GUI::Base gui;
 
@@ -49,5 +42,9 @@ class Gui {
         Tucano::GUI::Label ambient_label;
         Tucano::GUI::Label shininess_label;
 };
+
+
+} // namespace tucanow
+
 
 #endif

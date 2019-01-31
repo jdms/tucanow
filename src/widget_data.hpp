@@ -1,7 +1,8 @@
-#ifndef __WIDGET_DATA__
-#define __WIDGET_DATA__
+#ifndef __TUCANOW_WIDGET_DATA__
+#define __TUCANOW_WIDGET_DATA__
 
 #include <string>
+
 
 struct WidgetData 
 {
@@ -9,5 +10,6 @@ struct WidgetData
     std::string model_filename_ = {};
     bool mesh_is_initialized_ = false;
 };
+
 
 #endif
