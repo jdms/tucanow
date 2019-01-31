@@ -16,19 +16,20 @@ Gui::~Gui() = default;
 void Gui::initialize(int width, int height, std::string assets_dir)
 {
     setViewport(width, height);
+    auto gui = getTucanoGui();
 
     pimpl->menu_button.setPosition( 10, 10 );
     pimpl->menu_button.onClick ( [&](){pimpl->groupbox.toggleDisplay();} );
     pimpl->menu_button.setTexture ( assets_dir + "menu_button.pam" );
     //menu_button.setHoverTexture ( assets_dir + "reload_button.pam" );
     pimpl->menu_button.setDimensionsFromHeight(30);
-    pimpl->gui.add(&pimpl->menu_button);
+    gui->add(&pimpl->menu_button);
 
     int yoffset = 50;
     pimpl->groupbox.setPosition (1, 1 + yoffset);
     pimpl->groupbox.setDimensions (100, 220);
     pimpl->groupbox.setTexture (assets_dir + "groupbox.pam");
-    pimpl->gui.add(&pimpl->groupbox);
+    gui->add(&pimpl->groupbox);
 
     pimpl->reload_button.setPosition( 10, 10 + yoffset );
     pimpl->reload_button.onClick ( [&](){scene.pimpl->phong.reloadShaders();} );
@@ -93,14 +94,16 @@ bool Gui::setViewport(int width, int height)
         return false;
     }
 
-    pimpl->gui.setViewportSize (width, height);
+    auto gui = getTucanoGui();
+    gui->setViewportSize (width, height);
 
     return true;
 }
 
 void Gui::render()
 {
-    pimpl->gui.render();
+    auto gui = getTucanoGui();
+    gui->render();
 }
 
 bool Gui::leftButtonPressed(float xpos, float ypos)
@@ -111,7 +114,8 @@ bool Gui::leftButtonPressed(float xpos, float ypos)
     double scaled_xpos = scale_width * xpos;
     double scaled_ypos = scale_height * ypos;
 
-    return pimpl->gui.leftButtonPressed (scaled_xpos, scaled_ypos);
+    auto gui = getTucanoGui();
+    return gui->leftButtonPressed (scaled_xpos, scaled_ypos);
 }
 
 bool Gui::leftButtonReleased(float xpos, float ypos)
@@ -122,7 +126,8 @@ bool Gui::leftButtonReleased(float xpos, float ypos)
     double scaled_xpos = scale_width * xpos;
     double scaled_ypos = scale_height * ypos;
 
-    return pimpl->gui.leftButtonReleased (scaled_xpos, scaled_ypos);
+    auto gui = getTucanoGui();
+    return gui->leftButtonReleased (scaled_xpos, scaled_ypos);
 }
 
 bool Gui::cursorMove(float xpos, float ypos)
@@ -133,7 +138,8 @@ bool Gui::cursorMove(float xpos, float ypos)
     double scaled_xpos = scale_width * xpos;
     double scaled_ypos = scale_height * ypos;
 
-    return pimpl->gui.cursorMove (scaled_xpos, scaled_ypos);
+    auto gui = getTucanoGui();
+    return gui->cursorMove (scaled_xpos, scaled_ypos);
 }
 
 Tucano::GUI::Base* Gui::getTucanoGui()

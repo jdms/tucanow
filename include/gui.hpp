@@ -44,7 +44,6 @@ class Gui
     protected:
         virtual Tucano::GUI::Base* getTucanoGui();
 
-    private:
         Scene& scene;
         std::unique_ptr<GuiImpl> pimpl;
 };
