@@ -59,7 +59,7 @@ inline void errorCheckFunc (std::string file, int line, std::string message = ""
     GLenum ErrorCheckValue = glGetError();
     if (ErrorCheckValue != GL_NO_ERROR)
     {
-        #ifndef __APPLE__
+        #if defined(__TUCANO_USE_DEPRECATED_GLU)
             std::cerr << "GL error in " << file << "  line " << line << " : " << gluErrorString(ErrorCheckValue) << std::endl;
         #else
             std::cerr << "GL error in " << file << "  line " << line << " : " << ErrorCheckValue << std::endl;
