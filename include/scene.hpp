@@ -1,13 +1,6 @@
 #ifndef __TUCANOW_SCENE__
 #define __TUCANOW_SCENE__
 
-/* #include <GL/glew.h> */
-
-/* #include <tucano/utils/trackball.hpp> */
-/* #include <tucano/effects/phongshader.hpp> */
-/* #include <tucano/utils/plyimporter.hpp> */
-/* #include <tucano/utils/imageIO.hpp> */
-/* #include <tucano/gui/base.hpp> */
 
 #include<memory>
 #include<string>
@@ -19,6 +12,7 @@ namespace tucanow {
 
 struct SceneImpl;
 class Gui;
+
 
 class Scene 
 {

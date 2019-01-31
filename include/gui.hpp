@@ -1,10 +1,9 @@
 #ifndef __TUCANOW_GUI__
 #define __TUCANOW_GUI__
 
+
 #include <memory>
 #include <string>
-
-/* #include "scene.hpp" */
 
 
 namespace Tucano {

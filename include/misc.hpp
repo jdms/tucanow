@@ -5,8 +5,10 @@
 #include<iostream>
 #include<GL/glew.h>
 
+
 namespace tucanow {
 namespace misc {
+
 
 void initGlew()
 {

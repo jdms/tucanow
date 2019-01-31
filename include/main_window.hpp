@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 
+
 struct GLFWwindow;
 struct WidgetData;
 
@@ -12,6 +13,7 @@ namespace tucanow {
     class Scene;
     class Gui;
 }
+
 
 /// Create and manage aplication window
 class MainWindow
