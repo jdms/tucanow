@@ -76,8 +76,6 @@ public:
 
     void setClearColor(float r, float g, float b, float a = 0.0f);
 
-    bool setDefaultColor(float r, float g, float b, float a = 0.0f);
-
     /* bool setVertices(std::vector<float> &vertices); */
 
     /* bool setIndices(std::vector<unsigned int> &indices); */
@@ -89,6 +87,8 @@ public:
             const std::vector<unsigned int> &indices = {}, 
             const std::vector<float> &vertex_normals = {}
             );
+
+    bool setMeshColor(float r, float g, float b, float a = 0.0f);
 
     bool setMeshColorsRGB(std::vector<float> &colors);
 

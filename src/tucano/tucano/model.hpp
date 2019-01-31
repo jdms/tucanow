@@ -126,7 +126,7 @@ public:
 
     /**
      * @brief Returns a pointer to the model matrix.
-     * @return Pointer to the odel matrix as an Affine 3f matrix.
+     * @return Pointer to the model matrix as an Affine 3f matrix.
      */
     Eigen::Affine3f* modelMatrix (void)
     {

@@ -62,13 +62,6 @@ void SimpleWidget::setClearColor(float r, float g, float b, float a)
     pimpl->clear_color = Eigen::Vector4f(r, g, b, a);
 }
 
-bool SimpleWidget::setDefaultColor(float r, float g, float b, float a)
-{
-    pimpl->phong.setDefaultColor(Eigen::Vector4f(r, g, b, a));
-
-    return true;
-}
-
 bool SimpleWidget::setMesh(const std::vector<float> &vertices, const std::vector<GLuint> &indices, const std::vector<float> &vertex_normals)
 {
     if ( !vertex_normals.empty() )
@@ -161,6 +154,14 @@ bool SimpleWidget::setMesh(const std::vector<float> &vertices, const std::vector
 
 /*     return pimpl->mesh.loadNormals(normals); */
 /* } */
+
+bool SimpleWidget::setMeshColor(float r, float g, float b, float a)
+{
+    /* pimpl->phong.setMeshColor(Eigen::Vector4f(r, g, b, a)); */
+    pimpl->mesh.setColor(Eigen::Vector4f(r, g, b, a));
+
+    return true;
+}
 
 
 bool SimpleWidget::setMeshColorsRGB(std::vector<float> &colors)
