@@ -101,7 +101,7 @@ public:
      *
      * @param Name of file to open
      */
-    bool openMeshFile(std::string filename);
+    bool loadPLY(std::string filename);
 
     /**
      * @brief Set path for the shader's dir

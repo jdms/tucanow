@@ -199,7 +199,7 @@ bool SimpleWidget::setMeshTexCoords(std::vector<float> &texture)
     return pimpl->mesh.loadTexCoords(texture);
 }
 
-bool SimpleWidget::openMeshFile(std::string filename)
+bool SimpleWidget::loadPLY(std::string filename)
 {
     if ( pimpl->mesh_t != MeshType::NONE )
     {

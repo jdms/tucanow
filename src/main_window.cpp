@@ -74,7 +74,7 @@ void MainWindow::initialize (int width, int height, WidgetData &data)
     /* widget->initialize(width, height, data.assets_dir_); */
     widget->initialize(width, height);
 
-    widget->openMeshFile(data.model_filename_);
+    widget->loadPLY(data.model_filename_);
 
     std::cout << std::endl << std::endl;
     std::cout << " *********************************************** " << std::endl;
