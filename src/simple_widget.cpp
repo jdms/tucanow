@@ -29,6 +29,12 @@ void SimpleWidget::initialize(int width, int height)
     pimpl->light.setRenderFlag(false);
     pimpl->light.setViewport(Eigen::Vector2f ((float)width, (float)height));
 
+    // Manually tuned parameters
+    pimpl->phong.setAmbientCoeff(0.525);
+    pimpl->phong.setDiffuseCoeff(0.75);
+    pimpl->phong.setSpecularCoeff(0.0875);
+    pimpl->phong.setShininessCoeff(3.475);
+
     glEnable(GL_DEPTH_TEST);
 }
 
