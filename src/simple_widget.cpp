@@ -14,6 +14,12 @@ void SimpleWidget::initialize (int width, int height, std::string assets_dir /* 
 
     gui.setViewportSize (width, height);
 
+    // Manually tuned parameters
+    phong.setAmbientCoeff(0.525);
+    phong.setDiffuseCoeff(0.75);
+    phong.setSpecularCoeff(0.0875);
+    phong.setShininessCoeff(3.475);
+
     menu_button.setPosition( 10, 10 );
     menu_button.onClick ( [&](){groupbox.toggleDisplay();} );
     menu_button.setTexture ( assets_dir + "menu_button.pam" );
@@ -40,7 +46,7 @@ void SimpleWidget::initialize (int width, int height, std::string assets_dir /* 
 
     kd_slider.setPosition(10, 70 + yoffset);
     kd_slider.setDimensions(80, 10);
-    kd_slider.onValueChanged( [&](float v){phong.setDiffuseCoeff(v);} );
+    kd_slider.onValueChanged( [&](float v){phong.setDiffuseCoeff(v); std::cout << "DiffuseCoeff: " << v <<"\n";} );
     kd_slider.setTexture(assets_dir + "slider_bar.pam", assets_dir + "slider.pam");
     kd_slider.moveSlider(phong.getDiffuseCoeff());
     groupbox.add(&kd_slider);
@@ -52,7 +58,7 @@ void SimpleWidget::initialize (int width, int height, std::string assets_dir /* 
 
     ks_slider.setPosition(10, 110 + yoffset);
     ks_slider.setDimensions(80, 10);
-    ks_slider.onValueChanged( [&](float v){phong.setSpecularCoeff(v);} );
+    ks_slider.onValueChanged( [&](float v){phong.setSpecularCoeff(v); std::cout << "SpecularCoeff: " << v <<"\n";} );
     ks_slider.setTexture(assets_dir + "slider_bar.pam", assets_dir + "slider.pam");
     ks_slider.moveSlider(phong.getSpecularCoeff());
     groupbox.add(&ks_slider);
@@ -64,7 +70,7 @@ void SimpleWidget::initialize (int width, int height, std::string assets_dir /* 
 
     shininess_slider.setPosition(10, 150 + yoffset);
     shininess_slider.setDimensions(80, 10);
-    shininess_slider.onValueChanged( [&](float v){phong.setShininessCoeff(v);} );
+    shininess_slider.onValueChanged( [&](float v){phong.setShininessCoeff(v); std::cout << "ShininessCoeff: " << v <<"\n";} );
     shininess_slider.setTexture(assets_dir + "slider_bar.pam", assets_dir + "slider.pam");
     shininess_slider.setMinMaxValues(1.0, 100.0);
     shininess_slider.moveSlider(phong.getShininessCoeff());
@@ -77,7 +83,7 @@ void SimpleWidget::initialize (int width, int height, std::string assets_dir /* 
 
     ka_slider.setPosition(10, 190 + yoffset);
     ka_slider.setDimensions(80, 10);
-    ka_slider.onValueChanged( [&](float v){phong.setAmbientCoeff(v);} );
+    ka_slider.onValueChanged( [&](float v){phong.setAmbientCoeff(v); std::cout << "AmbientCoeff: " << v <<"\n";} );
     ka_slider.setTexture(assets_dir + "slider_bar.pam", assets_dir + "slider.pam");
     ka_slider.moveSlider(phong.getAmbientCoeff());
     groupbox.add(&ka_slider);
