@@ -229,7 +229,7 @@ int MainWindow::run(int width, int height, std::string title)
     const GLubyte* openGLVersion = glGetString(GL_VERSION);
     std::cout << std::endl;
     std::cout << "Renderer: " << openGLRenderer << std::endl;
-    std::cout << "OpenGL version supported: " << openGLVersion << std::endl;
+    std::cout << "OpenGL version in use: " << openGLVersion << std::endl;
 
     // macOS highdpi mode creates a framebuffer that differs from the window size
     int fb_width = 0;
