@@ -273,7 +273,10 @@ void Scene::decreaseCameraZoom()
 
 void Scene::rotateCamera(float xpos, float ypos)
 {
-    pimpl->camera.rotateCamera( Eigen::Vector2f (xpos, ypos) );
+    float scaled_xpos = scale_width * xpos;
+    float scaled_ypos = scale_height * ypos;
+
+    pimpl->camera.rotateCamera( Eigen::Vector2f (scaled_xpos, scaled_ypos) );
 }
 
 void Scene::stopRotateCamera()
@@ -283,7 +286,10 @@ void Scene::stopRotateCamera()
 
 void Scene::translateCamera(float xpos, float ypos)
 {
-    pimpl->camera.translateCamera( Eigen::Vector2f(xpos, ypos) );
+    float scaled_xpos = scale_width * xpos;
+    float scaled_ypos = scale_height * ypos;
+
+    pimpl->camera.translateCamera( Eigen::Vector2f(scaled_xpos, scaled_ypos) );
 }
 
 void Scene::stopTranslateCamera()
@@ -293,7 +299,10 @@ void Scene::stopTranslateCamera()
 
 void Scene::rotateLight(float xpos, float ypos)
 {
-    pimpl->light.rotateCamera( Eigen::Vector2f (xpos, ypos) );
+    float scaled_xpos = scale_width * xpos;
+    float scaled_ypos = scale_height * ypos;
+
+    pimpl->light.rotateCamera( Eigen::Vector2f (scaled_xpos, scaled_ypos) );
 }
 
 void Scene::stopRotateLight()
