@@ -9,84 +9,102 @@ project(MeshViewer)
 # For vim's YouCompleteMe plugin
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+option(TUCANOW_BUILD_SHARED_LIBRARY "Build tucanow as a shared library" ON)
+
+if(TUCANOW_BUILD_SHARED_LIBRARY)
+    set(TUCANOW_LIBRARY_TYPE "SHARED")
+endif()
 
 ###############################################
 # External libraries
 ###############################################
 
 find_package(OpenGL REQUIRED)
-link_libraries(${OPENGL_LIBRARIES})
 
 # GLEW is required by Tucano
 find_package(GLEW REQUIRED)
-include_directories(${GLEW_INCLUDE_DIRS})
-link_libraries(${GLEW_LIBRARIES})
 
 # Eigen3 is required by Tucano
 find_package(Eigen3 REQUIRED)
-include_directories(${EIGEN3_INCLUDE_DIRS})
 
 
-###############################################
-# Making glfw3 work is more fun! 
-###############################################
+# ###############################################
+# # Making glfw3 work is more fun! 
+# ###############################################
 
-# As per its docs, glfw3 requires the use of 
-# pkg-config (see `man pkg-config`)
+# # As per its docs, glfw3 requires the use of 
+# # pkg-config (see `man pkg-config`)
 
-find_package(PkgConfig REQUIRED)
+# find_package(PkgConfig REQUIRED)
 
-pkg_search_module(GLFW REQUIRED glfw3)
-include_directories(${GLFW_INCLUDE_DIRS})
+# pkg_search_module(GLFW REQUIRED glfw3)
+# include_directories(${GLFW_INCLUDE_DIRS})
 
-# What do we have, static or dynamic libraries?
-if(NOT GLFW_LIBRARIES)
-    set(GLFW_LIBRARIES ${GLFW_STATIC_LIBRARIES})
-endif()
-link_libraries(${GLFW_LIBRARIES})
+# # What do we have, static or dynamic libraries?
+# if(NOT GLFW_LIBRARIES)
+#     set(GLFW_LIBRARIES ${GLFW_STATIC_LIBRARIES})
+# endif()
+# link_libraries(${GLFW_LIBRARIES})
 
 
 ###############################################
 # Include project's files and build binary
 ###############################################
 
-set(CMAKE_CXX_FLAGS 
-    "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -ggdb3") 
 
-set(MESH_VIEWER_DIR "${CMAKE_SOURCE_DIR}") 
-
-include_directories(${MESH_VIEWER_DIR}/include)
-include_directories(${MESH_VIEWER_DIR}/src)
-include_directories(SYSTEM ${MESH_VIEWER_DIR}/src/tucano)
-
-set(MESH_VIEWER_SOURCES
-    ${MESH_VIEWER_DIR}/src/main_window.cpp
-    ${MESH_VIEWER_DIR}/src/scene.cpp
-    ${MESH_VIEWER_DIR}/src/gui.cpp
+set(TUCANOW_SOURCES
+    # ${MESH_VIEWER_DIR}/src/main_window.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/scene.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui.cpp
   )
 
-add_executable(mesh_viewer ${MESH_VIEWER_SOURCES} ${MESH_VIEWER_DIR}/src/main_load_ply.cpp)
-add_executable(mesh_viewer_spheres ${MESH_VIEWER_SOURCES} ${MESH_VIEWER_DIR}/src/main_spheres.cpp)
+add_library(tucanow ${TUCANOW_LIBRARY_TYPE} ${TUCANOW_SOURCES})
+add_library(tucanow::tucanow ALIAS tucanow)
+
+target_include_directories(tucanow
+    PUBLIC
+        $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/src/tucano
+)
+
+target_link_libraries(tucanow GLEW::GLEW OpenGL::OpenGL Eigen3::Eigen)
+
+target_compile_features(tucanow PUBLIC cxx_std_11)
+
+# MSVC (as recently as version 19.15.26729) throws hundreds of warnings from
+# it's own implementation of the STL -- CMake's SYSTEM directive seems
+# ineffective to prevent this behaviour.  Thus, using -Wall in MSVC is,
+# unfortunately, not possible.  
+
+if(NOT MSVC) 
+    target_compile_options(tucanow PRIVATE -Wall) 
+endif()
+
+# add_executable(mesh_viewer ${MESH_VIEWER_SOURCES} ${MESH_VIEWER_DIR}/src/main_load_ply.cpp)
+# add_executable(mesh_viewer_spheres ${MESH_VIEWER_SOURCES} ${MESH_VIEWER_DIR}/src/main_spheres.cpp)
 
 
 ###############################################
 # Copy shaders and assets to binary dir when done
 ###############################################
 
-add_custom_command(TARGET mesh_viewer POST_BUILD 
+add_custom_command(TARGET tucanow POST_BUILD 
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${MESH_VIEWER_DIR}/src/tucano/tucano/effects/shaders 
-        ${CMAKE_CURRENT_BINARY_DIR}/shaders 
-  )
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/tucano/tucano/effects/shaders 
+        ${CMAKE_BINARY_DIR}/shaders
+)
 
-add_custom_command(TARGET mesh_viewer POST_BUILD 
+add_custom_command(TARGET tucanow POST_BUILD 
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${MESH_VIEWER_DIR}/src/tucano/samples/assets
-        ${CMAKE_CURRENT_BINARY_DIR}/samples/assets
-  )
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/tucano/samples/assets
+        ${CMAKE_BINARY_DIR}/samples/assets
+)
 
-add_custom_command(TARGET mesh_viewer POST_BUILD 
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${MESH_VIEWER_DIR}/src/tucano/samples/models
-        ${CMAKE_CURRENT_BINARY_DIR}/samples/models
-  )
+# add_custom_command(TARGET tucanow POST_BUILD 
+#     COMMAND ${CMAKE_COMMAND} -E copy_directory
+#     ${CMAKE_CURRENT_SOURCE_DIR}/src/tucano/samples/models
+#         ${CMAKE_CURRENT_BINARY_DIR}/samples/models
+#   )
