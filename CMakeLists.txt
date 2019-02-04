@@ -2,19 +2,43 @@
 # Preamble  
 ###############################################
 
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.10)
 
 project(MeshViewer)
 
 # For vim's YouCompleteMe plugin
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+
+###############################################
+# Set build type (debug, release, etc.)
+###############################################
+
+# If empty will use the system's default build type
+
+set(TUCANOW_BUILD_TYPE "" CACHE STRING
+    "Set build type to: Debug, Release, RelWithDebInfo, MinSizeRel, or leave empty")
+
+if(TUCANOW_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "${TUCANOW_BUILD_TYPE}" CACHE INTERNAL "" FORCE)
+endif()
+
+
+###############################################
+# Project options 
+###############################################
+
 option(TUCANOW_BUILD_SHARED_LIBRARY "Build tucanow as a shared library" ON)
 
 if(TUCANOW_BUILD_SHARED_LIBRARY)
     set(TUCANOW_LIBRARY_TYPE "SHARED")
+
+    # Never have problems using dlls again!
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+else()
+    set(TUCANOW_LIBRARY_TYPE "STATIC")
 endif()
+
 
 ###############################################
 # External libraries
@@ -29,38 +53,17 @@ find_package(GLEW REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 
-# ###############################################
-# # Making glfw3 work is more fun! 
-# ###############################################
-
-# # As per its docs, glfw3 requires the use of 
-# # pkg-config (see `man pkg-config`)
-
-# find_package(PkgConfig REQUIRED)
-
-# pkg_search_module(GLFW REQUIRED glfw3)
-# include_directories(${GLFW_INCLUDE_DIRS})
-
-# # What do we have, static or dynamic libraries?
-# if(NOT GLFW_LIBRARIES)
-#     set(GLFW_LIBRARIES ${GLFW_STATIC_LIBRARIES})
-# endif()
-# link_libraries(${GLFW_LIBRARIES})
-
-
 ###############################################
-# Include project's files and build binary
+# Create library
 ###############################################
 
 
 set(TUCANOW_SOURCES
-    # ${MESH_VIEWER_DIR}/src/main_window.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/scene.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui.cpp
-  )
+)
 
 add_library(tucanow ${TUCANOW_LIBRARY_TYPE} ${TUCANOW_SOURCES})
-add_library(tucanow::tucanow ALIAS tucanow)
 
 target_include_directories(tucanow
     PUBLIC
@@ -68,7 +71,11 @@ target_include_directories(tucanow
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
-        SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/src/tucano
+)
+
+target_include_directories(tucanow SYSTEM
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/tucano
 )
 
 target_link_libraries(tucanow GLEW::GLEW OpenGL::GL Eigen3::Eigen)
@@ -104,8 +111,36 @@ add_custom_command(TARGET tucanow POST_BUILD
         ${CMAKE_BINARY_DIR}/samples/assets
 )
 
-# add_custom_command(TARGET tucanow POST_BUILD 
-#     COMMAND ${CMAKE_COMMAND} -E copy_directory
-#     ${CMAKE_CURRENT_SOURCE_DIR}/src/tucano/samples/models
-#         ${CMAKE_CURRENT_BINARY_DIR}/samples/models
-#   )
+
+###############################################
+# Set install and export CMake targets
+###############################################
+
+# Must use GNUInstallDirs to install libraries into correct
+# locations on all platforms.
+
+include(GNUInstallDirs)
+
+# Modify installation path in cmake generation step by setting var: 
+# CMAKE_INSTALL_PREFIX
+
+install(TARGETS tucanow 
+    EXPORT tucanow-export
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    COMPONENT tucanow
+)
+
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(EXPORT tucanow-export 
+    FILE tucanow-targets.cmake
+    NAMESPACE tucanow::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/tucanow
+)
+add_library(tucanow::tucanow ALIAS tucanow)
+
+# export(TARGETS tucanow FILE tucanow.cmake)
