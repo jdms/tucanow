@@ -60,13 +60,13 @@ include_directories(${MESH_VIEWER_DIR}/src)
 include_directories(SYSTEM ${MESH_VIEWER_DIR}/src/tucano)
 
 set(MESH_VIEWER_SOURCES
-    ${MESH_VIEWER_DIR}/src/main.cpp
     ${MESH_VIEWER_DIR}/src/main_window.cpp
     ${MESH_VIEWER_DIR}/src/scene.cpp
     ${MESH_VIEWER_DIR}/src/gui.cpp
   )
 
-add_executable(mesh_viewer ${MESH_VIEWER_SOURCES})
+add_executable(mesh_viewer ${MESH_VIEWER_SOURCES} ${MESH_VIEWER_DIR}/src/main_load_ply.cpp)
+add_executable(mesh_viewer_spheres ${MESH_VIEWER_SOURCES} ${MESH_VIEWER_DIR}/src/main_spheres.cpp)
 
 
 ###############################################

@@ -4,6 +4,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 
 struct GLFWwindow;
@@ -37,8 +38,16 @@ class MainWindow
         /// Deleted default move assigment
         MainWindow& operator=(MainWindow &&) = delete;
 
-        /// Set name of PLY mesh to be visualized
-        bool openMeshFile(std::string name);
+        /// Set mesh to be visualized (if PLY file is set, the PLY file will be visualized instead)
+        bool setMesh(
+                const std::vector<float> &vertices,
+                const std::vector<unsigned int> &triangles = {}, 
+                const std::vector<float> &normals = {},
+                const std::vector<float> &colors_rgb = {}
+            );
+
+        /// Set name of PLY mesh file to be visualized
+        bool openPLY(std::string name);
 
         /// Path to dir with widget's assets (textures, icons, etc.)
         bool setAssetsDir(std::string name);

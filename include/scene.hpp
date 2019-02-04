@@ -35,14 +35,14 @@ class Scene
          * @param viewport height in pixels 
          */
         virtual void initialize(int width, int height);
-        /* void initialize(int width, int height, std::string assets_dir = "./samples/assets/"); */
 
         virtual bool setViewport(int width, int height);
 
         virtual bool setScreenScale(float scale_width, float scale_height);
         virtual void getScreenScale(float& scale_width, float& scale_height);
 
-        virtual void setClearColor(float r, float g, float b, float a = 0.0f);
+        virtual void setClearColor(float r, float g, float b, float a = 1.f);
+        virtual void setClearColor(int r, int g, int b, int a = 255);
 
         /**
          * Repaints screen buffer.
@@ -55,7 +55,8 @@ class Scene
                 const std::vector<float> &vertex_normals = {}
                 );
 
-        bool setMeshColor(float r, float g, float b, float a = 0.0f);
+        void setMeshColor(float r, float g, float b, float a = 1.f);
+        void setMeshColor(int r, int g, int b, int a = 255);
 
         bool setMeshColorsRGB(std::vector<float> &colors);
 

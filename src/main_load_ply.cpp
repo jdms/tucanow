@@ -3,9 +3,10 @@
 
 int main()
 {
+    // Create main window
     auto& main_window = MainWindow::Get();
 
-    main_window.openMeshFile("./samples/models/toy.ply");
+    main_window.openPLY("./samples/models/toy.ply");
     main_window.setAssetsDir("./samples/assets/");
 
     const int window_width = 800;

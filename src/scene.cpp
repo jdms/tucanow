@@ -6,7 +6,10 @@ namespace tucanow {
 
 
 Scene::Scene() : pimpl(new SceneImpl)
-{}
+{
+    // Set light cyan as the background colour
+    setClearColor(224, 255, 255, 255);
+}
 
 Scene::~Scene() = default;
 
@@ -65,16 +68,23 @@ void Scene::setClearColor(float r, float g, float b, float a)
     pimpl->clear_color = Eigen::Vector4f(r, g, b, a);
 }
 
+void Scene::setClearColor(int r, int g, int b, int a)
+{
+    setClearColor((float)(r)/255.0f, (float)(g)/255.0f, (float)(b)/255.0f, (float)(a)/255.0f);
+}
+
 bool Scene::setMesh(const std::vector<float> &vertices, const std::vector<GLuint> &indices, const std::vector<float> &vertex_normals)
 {
     if ( !vertex_normals.empty() )
     if ( vertices.size() != vertex_normals.size() )
     {
+        /* std::cout << "\nError: vertices.size() != normals.size()\n"; */
         return false;
     }
     
     if ( vertices.empty() )
     {
+        /* std::cout << "\nError: vertices.empty() != true\n"; */
         return false;
     }
 
@@ -84,21 +94,27 @@ bool Scene::setMesh(const std::vector<float> &vertices, const std::vector<GLuint
     }
 
     bool success = pimpl->mesh.loadVertices(vertices);
+    /* if ( success ) */
+    /*     std::cout << "\nGot vertices\n"; */
+
 
     if ( success && !indices.empty() )
     {
         pimpl->mesh.loadIndices(indices);
+        /* std::cout << "\nGot indices\n"; */
     }
 
     if ( success && !vertex_normals.empty() )
     {
         pimpl->mesh.loadNormals(vertex_normals);
+        /* std::cout << "\nGot normals\n"; */
     }
 
     if ( success )
     {
         pimpl->mesh.normalizeModelMatrix();
         pimpl->mesh_t = MeshType::FROM_VECTORS;
+        /* std::cout << "\nGot mesh\n"; */
     }
 
     return success;
@@ -158,14 +174,16 @@ bool Scene::setMesh(const std::vector<float> &vertices, const std::vector<GLuint
 /*     return pimpl->mesh.loadNormals(normals); */
 /* } */
 
-bool Scene::setMeshColor(float r, float g, float b, float a)
+void Scene::setMeshColor(float r, float g, float b, float a)
 {
-    /* pimpl->phong.setMeshColor(Eigen::Vector4f(r, g, b, a)); */
+    /* pimpl->phong.setDefaultColor(Eigen::Vector4f(r, g, b, a)); */
     pimpl->mesh.setColor(Eigen::Vector4f(r, g, b, a));
-
-    return true;
 }
 
+void Scene::setMeshColor(int r, int g, int b, int a)
+{
+    setMeshColor((float)(r)/255.0f, (float)(g)/255.0f, (float)(b)/255.0f, (float)(a)/255.0f);
+}
 
 bool Scene::setMeshColorsRGB(std::vector<float> &colors)
 {
@@ -275,6 +293,9 @@ void Scene::rotateCamera(float xpos, float ypos)
 {
     float scaled_xpos = scale_width * xpos;
     float scaled_ypos = scale_height * ypos;
+
+    /* std::cout << "\nxpos = " << xpos << "; ypos = " << ypos << "\n"; */
+    /* std::cout << "\nscaled_xpos = " << scaled_xpos << "; scaled_ypos = " << scaled_ypos << "\n"; */
 
     pimpl->camera.rotateCamera( Eigen::Vector2f (scaled_xpos, scaled_ypos) );
 }

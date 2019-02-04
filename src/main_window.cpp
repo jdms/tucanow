@@ -31,7 +31,57 @@ MainWindow& MainWindow::Get()
     return single_instance;
 }
 
-bool MainWindow::openMeshFile(std::string filename)
+bool MainWindow::setMesh(
+        const std::vector<float> &vertices,
+        const std::vector<unsigned int> &triangles,
+        const std::vector<float> &normals,
+        const std::vector<float> &colors_rgb
+        )
+{
+    if ( vertices.empty() || (vertices.size() % 3 != 0) )
+    {
+        return false;
+    }
+
+    if ( !triangles.empty() )
+    {
+        if ( triangles.size() % 3 != 0 )
+        {
+            return false;
+        }
+    }
+
+    if ( !normals.empty() )
+    {
+        if ( normals.size() != vertices.size() )
+        {
+            return false;
+        }
+    }
+
+    if ( !colors_rgb.empty() )
+    {
+        if ( colors_rgb.size() % 3 != 0 )
+        {
+            return false;
+        }
+
+        if ( colors_rgb.size() != vertices.size() )
+        {
+            return false;
+        }
+    }
+
+    pdata_->vertices = vertices;
+    pdata_->triangles = triangles;
+    pdata_->normals = normals;
+    pdata_->colors_rgb = colors_rgb;
+    pdata_->mesh_is_initialized_ = true;
+
+    return true;
+}
+
+bool MainWindow::openPLY(std::string filename)
 {
     if ( filename.empty() )
     {
@@ -79,7 +129,15 @@ void MainWindow::initialize (int width, int height, WidgetData &data)
     pscene->initialize(width, height);
     pgui->initialize(width, height, data.assets_dir_);
 
-    pscene->loadMeshFromPLY(data.model_filename_);
+    if ( !data.model_filename_.empty() )
+    {
+        pscene->loadMeshFromPLY(data.model_filename_);
+    }
+    else
+    {
+        pscene->setMesh(data.vertices, data.triangles, data.normals);
+        pscene->setMeshColorsRGB(data.colors_rgb);
+    }
 
     std::cout << std::endl << std::endl;
     std::cout << " *********************************************** " << std::endl;
