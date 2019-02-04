@@ -71,7 +71,7 @@ target_include_directories(tucanow
         SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/src/tucano
 )
 
-target_link_libraries(tucanow GLEW::GLEW OpenGL::OpenGL Eigen3::Eigen)
+target_link_libraries(tucanow GLEW::GLEW OpenGL::GL Eigen3::Eigen)
 
 target_compile_features(tucanow PUBLIC cxx_std_11)
 
