@@ -13,6 +13,7 @@ option(TUCANOW_BUILD_SHARED_LIBRARY "Build tucanow as a shared library" ON)
 
 if(TUCANOW_BUILD_SHARED_LIBRARY)
     set(TUCANOW_LIBRARY_TYPE "SHARED")
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 
 ###############################################
