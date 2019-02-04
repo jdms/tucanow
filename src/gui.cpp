@@ -97,6 +97,8 @@ bool Gui::setViewport(int width, int height)
     auto gui = getTucanoGui();
     gui->setViewportSize (width, height);
 
+    scene.setViewport(width, height);
+
     return true;
 }
 
