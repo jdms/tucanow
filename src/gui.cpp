@@ -2,7 +2,7 @@
 
 #include "gui_impl.hpp"
 #include "scene_impl.hpp"
-#include "gui.hpp"
+#include "tucanow/gui.hpp"
 
 
 namespace tucanow {

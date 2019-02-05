@@ -1,5 +1,5 @@
 #include "scene_impl.hpp"
-#include "scene.hpp"
+#include "tucanow/scene.hpp"
 
 
 namespace tucanow {

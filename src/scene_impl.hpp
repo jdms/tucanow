@@ -10,7 +10,7 @@
 #include <tucano/utils/imageIO.hpp>
 #include <tucano/gui/base.hpp>
 
-#include "scene.hpp"
+#include "tucanow/scene.hpp"
 
 
 namespace tucanow {
