@@ -4,6 +4,8 @@
 
 *build/
 doc/html
+win32-libs/eigen*
+win32-libs/glew*
 
 
 ###################
