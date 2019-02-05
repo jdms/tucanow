@@ -4,7 +4,7 @@
 
 cmake_minimum_required(VERSION 3.10)
 
-project(MeshViewer)
+project(TucanoWrapper)
 
 # For vim's YouCompleteMe plugin
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -35,8 +35,10 @@ if(TUCANOW_BUILD_SHARED_LIBRARY)
 
     # Never have problems using dlls again!
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
 else()
     set(TUCANOW_LIBRARY_TYPE "STATIC")
+
 endif()
 
 
@@ -46,11 +48,17 @@ endif()
 
 find_package(OpenGL REQUIRED)
 
-# GLEW is required by Tucano
-find_package(GLEW REQUIRED)
+if(WIN32)
+    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/win32-libs")
 
-# Eigen3 is required by Tucano
-find_package(Eigen3 REQUIRED)
+else()
+    # GLEW is required by Tucano
+    find_package(GLEW REQUIRED)
+
+    # Eigen3 is required by Tucano
+    find_package(Eigen3 REQUIRED)
+endif()
+
 
 
 ###############################################
@@ -61,22 +69,22 @@ find_package(Eigen3 REQUIRED)
 set(TUCANOW_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/scene.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui.cpp
-)
+    )
 
 add_library(tucanow ${TUCANOW_LIBRARY_TYPE} ${TUCANOW_SOURCES})
 
 target_include_directories(tucanow
     PUBLIC
-        $<INSTALL_INTERFACE:include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
-)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    )
 
 target_include_directories(tucanow SYSTEM
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/tucano
-)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/tucano
+    )
 
 target_link_libraries(tucanow GLEW::GLEW OpenGL::GL Eigen3::Eigen)
 
@@ -91,6 +99,11 @@ if(NOT MSVC)
     target_compile_options(tucanow PRIVATE -Wall) 
 endif()
 
+# Constant M_PI is predefined on posix systems (which Windows allegedly is compatible with)
+if(MSVC)
+    target_compile_options(tucanow PRIVATE -DM_PI=3.14159265358979323846264338327950288)
+endif()
+
 # add_executable(mesh_viewer ${MESH_VIEWER_SOURCES} ${MESH_VIEWER_DIR}/src/main_load_ply.cpp)
 # add_executable(mesh_viewer_spheres ${MESH_VIEWER_SOURCES} ${MESH_VIEWER_DIR}/src/main_spheres.cpp)
 
@@ -102,45 +115,45 @@ endif()
 add_custom_command(TARGET tucanow POST_BUILD 
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_CURRENT_SOURCE_DIR}/src/tucano/tucano/effects/shaders 
-        ${CMAKE_BINARY_DIR}/shaders
-)
+    ${CMAKE_BINARY_DIR}/shaders
+    )
 
 add_custom_command(TARGET tucanow POST_BUILD 
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_CURRENT_SOURCE_DIR}/src/tucano/samples/assets
-        ${CMAKE_BINARY_DIR}/samples/assets
-)
+    ${CMAKE_BINARY_DIR}/samples/assets
+    )
 
 
 ###############################################
 # Set install and export CMake targets
 ###############################################
 
-# Must use GNUInstallDirs to install libraries into correct
-# locations on all platforms.
+# # Must use GNUInstallDirs to install libraries into correct
+# # locations on all platforms.
 
-include(GNUInstallDirs)
+# include(GNUInstallDirs)
 
-# Modify installation path in cmake generation step by setting var: 
-# CMAKE_INSTALL_PREFIX
+# # Modify installation path in cmake generation step by setting var:
+# # CMAKE_INSTALL_PREFIX
 
-install(TARGETS tucanow 
-    EXPORT tucanow-export
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    COMPONENT tucanow
-)
+# install(TARGETS tucanow
+#     EXPORT tucanow-export
+#     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+#     COMPONENT tucanow
+#     )
 
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include"
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-)
+# install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include"
+#     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+#     )
 
-install(EXPORT tucanow-export 
-    FILE tucanow-targets.cmake
-    NAMESPACE tucanow::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/tucanow
-)
+# install(EXPORT tucanow-export
+#     FILE tucanow-targets.cmake
+#     NAMESPACE tucanow::
+#     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/tucanow
+#     )
 add_library(tucanow::tucanow ALIAS tucanow)
 
-# export(TARGETS tucanow FILE tucanow.cmake)
+# # export(TARGETS tucanow FILE tucanow.cmake)
