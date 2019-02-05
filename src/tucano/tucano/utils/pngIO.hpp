@@ -42,8 +42,13 @@ namespace Tucano
 namespace ImageImporter
 {
 
-static bool loadPNGImage (string filename, Tucano::Texture *tex) __attribute__ ((unused));
-static bool writePNGImage (string filename, Tucano::Framebuffer* fbo, int attach = 0) __attribute__ ((unused));
+#if defined(_WIN32) && defined(_MSC_VER)
+    static bool loadPNGImage (string filename, Tucano::Texture *tex);
+    static bool writePNGImage (string filename, Tucano::Framebuffer* fbo, int attach = 0);
+#else
+    static bool loadPNGImage (string filename, Tucano::Texture *tex) __attribute__ ((unused));
+    static bool writePNGImage (string filename, Tucano::Framebuffer* fbo, int attach = 0) __attribute__ ((unused));
+#endif
 
 static void abort_(const char * s, ...)
 {

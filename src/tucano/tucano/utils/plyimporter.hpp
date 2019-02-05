@@ -34,10 +34,17 @@ namespace MeshImporter
 //#if _WIN32  //define something for Windows (32-bit and 64-bit, this part is common)
 //    #pragma warning(disable:4996)
 //#else
+
+#if defined(_WIN32) && defined(_MSC_VER)
+    static bool loadPlyFile (Mesh* mesh, string filename);
+    static void faceToVertexTexCoords (vector<unsigned int> &indices, vector<float> &face_tex_coords, std::vector<Eigen::Vector4f> &vertices, std::vector<Eigen::Vector3f> &normals, std::vector<Eigen::Vector4f> &colors, std::vector<Eigen::Vector2f> &tex_coords);
+    static string getPlyTextureFile (string filename);
+#else
     // avoid warnings of unused function
-	static bool loadPlyFile (Mesh* mesh, string filename) __attribute__ ((unused));
+    static bool loadPlyFile (Mesh* mesh, string filename) __attribute__ ((unused));
     static void faceToVertexTexCoords (vector<unsigned int> &indices, vector<float> &face_tex_coords, std::vector<Eigen::Vector4f> &vertices, std::vector<Eigen::Vector3f> &normals, std::vector<Eigen::Vector4f> &colors, std::vector<Eigen::Vector2f> &tex_coords) __attribute__ ((unused));
     static string getPlyTextureFile (string filename) __attribute__ ((unused));
+#endif
 //#endif
 
 

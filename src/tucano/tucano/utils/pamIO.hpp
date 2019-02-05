@@ -31,8 +31,13 @@ namespace Tucano
 namespace ImageImporter
 {
 
-static bool loadPAMImage (string filename, Tucano::Texture *tex) __attribute__ ((unused));
-static bool writePAMImage (string filename, Tucano::Framebuffer* fbo, int attach = 0) __attribute__ ((unused));
+#if defined(_WIN32) && defined(_MSC_VER)
+    static bool loadPAMImage (string filename, Tucano::Texture *tex);
+    static bool writePAMImage (string filename, Tucano::Framebuffer* fbo, int attach = 0);
+#else
+    static bool loadPAMImage (string filename, Tucano::Texture *tex) __attribute__ ((unused));
+    static bool writePAMImage (string filename, Tucano::Framebuffer* fbo, int attach = 0) __attribute__ ((unused));
+#endif
 
 
 /* @brief Loads a texture from a PAM file.

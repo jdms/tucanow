@@ -32,10 +32,15 @@ namespace Tucano
 namespace ImageImporter
 {
 
-static bool loadImage (string filename, Tucano::Texture* tex) __attribute__ ((unused));
-static bool writeImage (string filename, Tucano::Framebuffer* tex, int attach = 0) __attribute__ ((unused));
-static bool searchAlternativeExtension (string filename, string ext) __attribute__ ((unused));
-
+#if defined(_WIN32) && defined(_MSC_VER)
+    static bool loadImage (string filename, Tucano::Texture* tex);
+    static bool writeImage (string filename, Tucano::Framebuffer* tex, int attach = 0);
+    static bool searchAlternativeExtension (string filename, string ext);
+#else
+    static bool loadImage (string filename, Tucano::Texture* tex) __attribute__ ((unused));
+    static bool writeImage (string filename, Tucano::Framebuffer* tex, int attach = 0) __attribute__ ((unused));
+    static bool searchAlternativeExtension (string filename, string ext) __attribute__ ((unused));
+#endif
 
 /**
  * @brief If file format not supported searches for an alternative supported file (same name)

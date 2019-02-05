@@ -31,7 +31,11 @@ namespace Tucano
 namespace ImageImporter
 {
 
-static bool loadPPMImage (string filename, Tucano::Texture* tex) __attribute__ ((unused));
+#if defined(_WIN32) && defined(_MSC_VER)
+    static bool loadPPMImage (string filename, Tucano::Texture* tex);
+#else
+    static bool loadPPMImage (string filename, Tucano::Texture* tex) __attribute__ ((unused));
+#endif
 
 /**
  * @brief Loads a texture from a PPM file.

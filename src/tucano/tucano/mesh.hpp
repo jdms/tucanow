@@ -29,6 +29,7 @@
 
 
 using ulong = unsigned long int;
+using uint = unsigned int;
 
 
 namespace Tucano
