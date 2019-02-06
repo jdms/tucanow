@@ -69,6 +69,7 @@ endif()
 set(TUCANOW_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/scene.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/misc.cpp
     )
 
 add_library(tucanow ${TUCANOW_LIBRARY_TYPE} ${TUCANOW_SOURCES})
@@ -86,7 +87,12 @@ target_include_directories(tucanow SYSTEM
     ${CMAKE_CURRENT_SOURCE_DIR}/src/tucano
     )
 
-target_link_libraries(tucanow GLEW::GLEW OpenGL::GL Eigen3::Eigen)
+target_link_libraries(tucanow 
+    PUBLIC
+    OpenGL::GL Eigen3::Eigen
+    PRIVATE
+    GLEW::GLEW
+    )
 
 target_compile_features(tucanow PUBLIC cxx_std_11)
 
