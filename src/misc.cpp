@@ -15,7 +15,7 @@ void initGlew()
     GLenum glewInitResult = glewInit();
     if (GLEW_OK != glewInitResult)
     {
-        std::cerr << "Error: " << glewGetErrorString(glewInitResult) << std::endl;
+        std::cerr << "\nError: " << glewGetErrorString(glewInitResult) << std::endl << std::flush;
         exit(EXIT_FAILURE);
     }
 }

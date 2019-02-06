@@ -1,12 +1,18 @@
 #include "scene_impl.hpp"
 #include "tucanow/scene.hpp"
+/* #include "tucanow/misc.hpp" */
 
 
 namespace tucanow {
 
 
-Scene::Scene() : pimpl(new SceneImpl)
+Scene::Scene() //: pimpl(new SceneImpl)
 {
+    // Glew must be initialized before any Tucano object is created
+    /* misc::initGlew(); */
+
+    pimpl.reset(new SceneImpl);
+
     // Set light cyan as the background colour
     setClearColor(224, 255, 255, 255);
 }
