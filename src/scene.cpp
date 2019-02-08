@@ -40,6 +40,7 @@ void Scene::initialize(int width, int height)
 
     pimpl->light.setRenderFlag(false);
     pimpl->light.setViewport(Eigen::Vector2f ((float)width, (float)height));
+    setHeadlight(headlight_camera);
 
     // Manually tuned parameters
     pimpl->phong.setAmbientCoeff(0.525);
