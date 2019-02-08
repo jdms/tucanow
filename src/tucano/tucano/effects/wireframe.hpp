@@ -111,7 +111,7 @@ public:
 		wireframe_shader.setUniform("line_color", line_color);
         wireframe_shader.setUniform("thickness", thickness);
 
-        Tucano::Misc::errorCheckFunc(__FILE__, __LINE__);
+        /* Tucano::Misc::errorCheckFunc(__FILE__, __LINE__); */
         mesh.setAttributeLocation(wireframe_shader);
 
         mesh.render();
