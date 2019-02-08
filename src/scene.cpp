@@ -279,6 +279,21 @@ bool Scene::setViewport(int width, int height)
     return true;
 }
 
+void Scene::setHeadlight(bool headligh)
+{
+    headlight_camera = headligh;
+
+    if (headlight_camera)
+    {
+        *(pimpl->light.viewMatrix()) = *(pimpl->camera.viewMatrix());
+    }
+}
+
+void Scene::toggleHeadlight()
+{
+    setHeadlight(!headlight_camera);
+}
+
 void Scene::resetCamera()
 {
     pimpl->camera.reset();
@@ -304,11 +319,21 @@ void Scene::rotateCamera(float xpos, float ypos)
     /* std::cout << "\nscaled_xpos = " << scaled_xpos << "; scaled_ypos = " << scaled_ypos << "\n"; */
 
     pimpl->camera.rotateCamera( Eigen::Vector2f (scaled_xpos, scaled_ypos) );
+
+    if( headlight_camera )
+    {
+        *(pimpl->light.viewMatrix()) = *(pimpl->camera.viewMatrix());
+    }
 }
 
 void Scene::stopRotateCamera()
 {
     pimpl->camera.endRotation();
+
+    if( headlight_camera )
+    {
+        *(pimpl->light.viewMatrix()) = *(pimpl->camera.viewMatrix());
+    }
 }
 
 void Scene::translateCamera(float xpos, float ypos)
@@ -329,12 +354,18 @@ void Scene::rotateLight(float xpos, float ypos)
     float scaled_xpos = scale_width * xpos;
     float scaled_ypos = scale_height * ypos;
 
-    pimpl->light.rotateCamera( Eigen::Vector2f (scaled_xpos, scaled_ypos) );
+    if (!headlight_camera)
+    {
+        pimpl->light.rotateCamera( Eigen::Vector2f (scaled_xpos, scaled_ypos) );
+    }
 }
 
 void Scene::stopRotateLight()
 {
-    pimpl->light.endRotation();
+    if (!headlight_camera)
+    {
+        pimpl->light.endRotation();
+    }
 }
 
 

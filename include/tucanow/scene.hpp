@@ -184,6 +184,19 @@ class Scene
         bool setModelTexture(std::string tex_file);
 
         /**
+         * @brief Place light source direction at the trackball camera direction
+         *
+         * @param Set true for headlight, false for fixed light
+         */
+        void setHeadlight(bool headlight);
+
+        /**
+         * Alternate between a headlight and a fixed light
+         */
+        void toggleHeadlight();
+        // toggle
+
+        /**
          * Reset camera
          */
         void resetCamera();
@@ -243,6 +256,8 @@ class Scene
     private:
         std::unique_ptr<SceneImpl> pimpl;
         friend class Gui;
+
+        bool headlight_camera = true;
 
         float scale_width = 1.0f; ///<-- Ratio (framebuffer_width)/(window_width)
         float scale_height = 1.0f; ///<-- Ratio (framebuffer_height)/(window_height)
