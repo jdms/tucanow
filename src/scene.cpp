@@ -33,6 +33,7 @@ void Scene::initialize(int width, int height)
 
     // initialize the shader effect (if TUCANOSHADERDIR is set, no need to set dir before init)
     pimpl->phong.initialize();
+    pimpl->wireframe.initialize();
 
     pimpl->camera.setPerspectiveMatrix(60.0, (float)width/(float)height, 0.1f, 100.0f);
     pimpl->camera.setRenderFlag(false);
@@ -61,8 +62,25 @@ void Scene::render(void)
         );
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-    pimpl->phong.render(pimpl->mesh, pimpl->camera, pimpl->light);
+    if ( render_wireframe )
+    {
+        pimpl->wireframe.render(pimpl->mesh, pimpl->camera, pimpl->light);
+    }
+    else
+    {
+        pimpl->phong.render(pimpl->mesh, pimpl->camera, pimpl->light);
+    }
     pimpl->camera.render();
+}
+
+void Scene::renderWireframe(bool wireframe)
+{
+    render_wireframe = wireframe;
+}
+
+void Scene::toggleRenderWireframe()
+{
+    render_wireframe = !render_wireframe;
 }
 
 /* void Scene::setShaderDir(std::string dir) */

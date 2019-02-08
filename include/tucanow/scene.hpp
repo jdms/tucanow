@@ -94,6 +94,19 @@ class Scene
         virtual void render();
 
         /**
+         * @brief Render model with a single pass wireframe shader
+         *
+         * Triangles are shaded with flat colours.
+         *
+         * @param Set true to render wireframe, false for default shading
+         */
+        void renderWireframe(bool render_wireframe);
+
+        /**
+         * Alternate between wireframe and default shading
+         */
+        void toggleRenderWireframe();
+        /**
          * @brief Load a mesh to visualize
          *
          * @param Mesh vertices (must be non-empty)
@@ -256,6 +269,8 @@ class Scene
     private:
         std::unique_ptr<SceneImpl> pimpl;
         friend class Gui;
+
+        bool render_wireframe = false;
 
         bool headlight_camera = true;
 

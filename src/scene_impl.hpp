@@ -6,6 +6,7 @@
 
 #include <tucano/utils/trackball.hpp>
 #include <tucano/effects/phongshader.hpp>
+#include <tucano/effects/wireframe.hpp>
 #include <tucano/utils/plyimporter.hpp>
 #include <tucano/utils/imageIO.hpp>
 #include <tucano/gui/base.hpp>
@@ -23,6 +24,9 @@ struct SceneImpl
 
     /// Phong effect to render mesh
     Tucano::Effects::Phong phong;
+
+    /// Single pass wireframe shader
+    Tucano::Effects::Wireframe wireframe;
 
     /// Trackball for manipulating the camera
     Tucano::Trackball camera;
