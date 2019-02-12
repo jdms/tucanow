@@ -20,13 +20,34 @@ class Gui;
 class Scene 
 {
     public:
+        /**
+         * @brief Constructor implements the pimpl idiom
+         */
         Scene();
+
+        /**
+         * @brief Default destructor
+         */
         virtual ~Scene();
 
+        /**
+         * @brief Deleted copy constructor
+         */
         Scene(const Scene &) = delete;
+
+        /**
+         * @brief Deleted copy assignment
+         */
         Scene& operator=(const Scene &) = delete;
 
+        /**
+         * @brief Default move constructor
+         */
         Scene(Scene &&);
+
+        /**
+         * @brief Default move assignment
+         */
         Scene& operator=(Scene &&);
 
         /**
@@ -182,14 +203,6 @@ class Scene
          */
         bool loadMeshFromPLY(std::string filename);
 
-        // /**
-        //  * @brief Set path for the shader's dir
-        //  *
-        //  * @param dir Path to shader's dir
-        //  */
-
-        // /* void setShaderDir(std::string dir); */
-
         /**
          * @brief Sets a texture for the model
          *
@@ -267,10 +280,14 @@ class Scene
          */
         void stopRotateLight();
 
-    private:
+    protected:
         std::unique_ptr<SceneImpl> pimpl; ///<-- Tucano data
+
+        /** @relates tucanow::Gui
+         * */
         friend class Gui;
 
+    private:
         bool render_wireframe = false; ///<-- Controls whether wireframe or default rendering is used
 
         bool headlight_camera = true; ///<-- Controls whether a headlight or a fixed light is used

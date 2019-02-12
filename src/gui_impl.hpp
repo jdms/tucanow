@@ -2,6 +2,10 @@
 #define __TUCANOW_GUI_IMPL__
 
 
+/** @file gui_impl.hpp src/gui_impl.hpp
+ * */
+
+
 /* #include <GL/glew.h> */
 
 /* #include <tucano/tucano.hpp> */
@@ -32,14 +36,26 @@ struct GuiImpl
 
         /// Slider for diffuse coefficient
         Tucano::GUI::Slider kd_slider;
+
+        /// Slider for specular coefficient
         Tucano::GUI::Slider ks_slider;
+
+        /// Slider for ambient coefficient
         Tucano::GUI::Slider ka_slider;
+
+        /// Slider for shininess coefficient
         Tucano::GUI::Slider shininess_slider;
 
         /// Label for diffuse text
         Tucano::GUI::Label diffuse_label;
+
+        /// Label for specular text
         Tucano::GUI::Label specular_label;
+
+        /// Label for ambient text
         Tucano::GUI::Label ambient_label;
+
+        /// Label for shininess text
         Tucano::GUI::Label shininess_label;
 };
 

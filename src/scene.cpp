@@ -83,6 +83,14 @@ void Scene::toggleRenderWireframe()
     render_wireframe = !render_wireframe;
 }
 
+// /**
+//  * @brief Set path for the shader's dir
+//  *
+//  * @param dir Path to shader's dir
+//  */
+
+// /* void setShaderDir(std::string dir); */
+
 /* void Scene::setShaderDir(std::string dir) */
 /* { */
 /*     pimpl->shader_dir = dir; */

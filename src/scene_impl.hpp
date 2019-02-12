@@ -2,6 +2,10 @@
 #define __TUCANOW_SCENE_IMPL__
 
 
+/** @file scene_impl.hpp src/scene_impl.hpp
+ * */
+
+
 /* #include <GL/glew.h> */
 
 #include <tucano/utils/trackball.hpp>
@@ -40,10 +44,11 @@ struct SceneImpl
     /// OpenGL clear color
     Eigen::Vector4f clear_color = Eigen::Vector4f(1.f, 1.f, 1.f, 0.f);
 
+    /// Source of current mesh
     enum class MeshType { NONE, FROM_VECTORS, FROM_FILE } mesh_t = MeshType::NONE;
 };
 
-using MeshType = SceneImpl::MeshType;
+using MeshType = SceneImpl::MeshType; ///<-- Rename SceneImpl::MeshType in tucanow namespace
 
 
 } // namespace tucanow

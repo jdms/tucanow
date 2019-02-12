@@ -25,13 +25,35 @@ class Scene;
 class Gui 
 {
     public: 
+        /**
+         * @brief Constructor implements the pimpl idiom
+         */
         Gui(Scene&);
+
+        /**
+         * @brief Default destructor
+         */
         virtual ~Gui();
 
+
+        /**
+         * @brief Deleted copy constructor
+         */
         Gui(Gui &) = delete;
+
+        /**
+         * @brief Deleted copy assignment
+         */
         Gui& operator=(Gui &) = delete;
 
+        /**
+         * @brief Deleted move constructor
+         */
         Gui(Gui &&) = delete;
+
+        /**
+         * @brief Deleted move assignment
+         */
         Gui& operator=(Gui&&) = delete;
 
         /**
@@ -59,7 +81,7 @@ class Gui
         virtual void render();
 
         /**
-         * @brief Treats mouse left click callback for all elements
+         * @brief Handles mouse left click callback for all elements
          *
          * @param xpos Mouse x position
          * @param ypos Mouse y position
@@ -69,7 +91,7 @@ class Gui
         virtual bool leftButtonPressed(float xpos, float ypos);
 
         /**
-         * @brief Treats mouse left release callback for last clicked element
+         * @brief Handles mouse left release callback for last clicked element
          *
          * @param xpos Mouse x position
          * @param ypos Mouse y position
@@ -79,7 +101,7 @@ class Gui
         virtual bool leftButtonReleased(float xpos, float ypos);
 
         /**
-         * @brief Treats mouse mouvement
+         * @brief Handles mouse movement
          *
          * @param xpos Mouse x position
          * @param ypos Mouse y position
@@ -96,7 +118,7 @@ class Gui
          */
         virtual Tucano::GUI::Base* getTucanoGui();
 
-        Scene& scene;
+        Scene& scene; ///<-- Reference to Scene object
         std::unique_ptr<GuiImpl> pimpl; ///<-- Tucano data
 };
 
