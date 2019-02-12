@@ -6,6 +6,9 @@ cmake_minimum_required(VERSION 3.10)
 
 project(TucanoWrapper)
 
+set(VERSION_MAJOR 0 CACHE STRING "Tucanow major version number.")
+set(VERSION_MINOR 1 CACHE STRING "Tucanow minor version number.")
+
 # For vim's YouCompleteMe plugin
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -28,18 +31,22 @@ endif()
 # Project options 
 ###############################################
 
-option(TUCANOW_BUILD_SHARED_LIBRARY "Build tucanow as a shared library" ON)
+option(TUCANOW_BUILD_SHARED_LIBRARY "Build tucanow as a shared library"  ON)
+option(TUCANOW_BUILD_DOCS           "Build documentation with Doxygen"   ON)
 
 if(TUCANOW_BUILD_SHARED_LIBRARY)
     set(TUCANOW_LIBRARY_TYPE "SHARED")
 
     # Never have problems using dlls again!
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-
 else()
     set(TUCANOW_LIBRARY_TYPE "STATIC")
-
 endif()
+
+if (TUCANOW_BUILD_DOCS)
+    include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/BuildDocumentation.cmake")
+endif(TUCANOW_BUILD_DOCS)
+
 
 
 ###############################################
