@@ -1115,6 +1115,25 @@ public:
         return false;
     }
 
+    /**
+     * @brief Returns whether an attribute exists or not.
+     * @param name Name of attribute to be queried.
+     * @param attrib_index Index of queried attribute, if found.
+     * @return True if attribute exists, false otherwise.
+     */
+    bool hasAttribute (const string& name, size_t &attrib_index ) const
+    {
+        for (unsigned int i = 0; i < vertex_attributes.size(); ++i)
+        {
+            if ( vertex_attributes[i].getName().compare(name) == 0 )
+            {
+                attrib_index = static_cast<size_t>(i);
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     /**
     * @brief Returns a pointer to an attribute
@@ -1236,6 +1255,45 @@ public:
     }
     
     /**
+     * @brief TODO: test and document
+     */
+    void fillBufferWithAttribute( VertexAttribute &va, const std::vector<float> &attrib )
+    {
+        // fill buffer with attribute data
+        va.bind();
+        glBufferData(va.getArrayType(), va.getSize()*va.getElementSize()*va.getTypeSize(), attrib.data(), GL_STATIC_DRAW);
+        va.unbind();
+    }
+
+    /**
+     * @brief TODO: test and document
+     *
+     * Properly change the createAttribute#() methods
+     * Update Mesh::setColor() to check whether an "in_Color" attribute is already present and clear it?
+     *
+     * @param name Name of the attribute.
+     * @param attrib Array with new attribute.
+     * @return Pointer to created attribute
+     */
+    VertexAttribute* pushAttribute( VertexAttribute &va )
+    {
+        size_t attrib_index;
+        bool found = hasAttribute(va.getName(), attrib_index);
+
+        if ( found )
+        {
+            vertex_attributes[attrib_index] = va;
+        }
+        else
+        {
+            attrib_index = vertex_attributes.size();
+            vertex_attributes.push_back(va);
+        }
+
+        return &vertex_attributes[attrib_index];
+    }
+
+    /**
      * @brief Creates and loads a new mesh attribute of 3 floats.
      * @param name Name of the attribute.
      * @param attrib Array with new attribute.
@@ -1281,12 +1339,14 @@ public:
         VertexAttribute va (name, attrib.size()/3, 3, GL_FLOAT);
 
         // fill buffer with attribute data
-        va.bind();
-        glBufferData(va.getArrayType(), va.getSize()*va.getElementSize()*va.getTypeSize(), attrib.data(), GL_STATIC_DRAW);
-        va.unbind();
+        /* va.bind(); */
+        /* glBufferData(va.getArrayType(), va.getSize()*va.getElementSize()*va.getTypeSize(), attrib.data(), GL_STATIC_DRAW); */
+        /* va.unbind(); */
+        fillBufferWithAttribute(va, attrib);
 
-        vertex_attributes.push_back(va);
-        return &vertex_attributes[vertex_attributes.size()-1];
+        /* vertex_attributes.push_back(va); */
+        /* return &vertex_attributes[vertex_attributes.size()-1]; */
+        return pushAttribute(va);
     }
 
     /**

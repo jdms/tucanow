@@ -50,6 +50,9 @@ class Scene
          */
         Scene& operator=(Scene &&);
 
+        // TODO: Change from initializer to factory method.
+        std::unique_ptr<Scene> Get(int width, int height);
+
         /**
          * @brief Initializes the scene and shaders
          *
