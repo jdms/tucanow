@@ -1,3 +1,4 @@
 [submodule "src/tucano"]
 	path = src/tucano
 	url = git@bitbucket.org:jdms/tucano.git
+	branch = devel-jd
