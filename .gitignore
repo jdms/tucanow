@@ -6,6 +6,8 @@
 doc/html
 win32-libs/eigen*
 win32-libs/glew*
+tucano.pdf
+doc/tucano.pdf
 
 
 ###################

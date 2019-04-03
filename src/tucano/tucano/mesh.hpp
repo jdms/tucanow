@@ -326,6 +326,34 @@ public:
         #endif
     }
 
+    /**
+     * @brief Returns the default color of the model
+     * @return RGBA default color
+     */
+    Eigen::Vector4f getColor (void)
+    {
+        return default_color;
+    }
+
+    /**
+     * @brief Sets the default color of the model
+     * @param color Given new default color
+     */
+    void setColor (const Eigen::Vector4f & color)
+    {
+        Model::setColor(color);
+        default_color = color;
+
+        size_t attrib_index;
+        bool found = hasAttribute("in_Color", attrib_index);
+
+        if ( found )
+        {
+            auto it = vertex_attributes.begin() + attrib_index;
+            vertex_attributes.erase(it);
+        }
+    }
+
 /*
     #if __cplusplus > 199711L
 		/// Move constructor.
@@ -1245,17 +1273,21 @@ public:
         VertexAttribute va (name, attrib.size()/4, 4, GL_FLOAT);
 
         // fill buffer with attribute data
-        va.bind();
-        glBufferData(va.getArrayType(), va.getSize()*va.getElementSize()*va.getTypeSize(), attrib.data(), GL_STATIC_DRAW);
-        va.unbind();
+        /* va.bind(); */
+        /* glBufferData(va.getArrayType(), va.getSize()*va.getElementSize()*va.getTypeSize(), attrib.data(), GL_STATIC_DRAW); */
+        /* va.unbind(); */
+        fillBufferWithAttribute(va, attrib);
 
-        vertex_attributes.push_back(va);
-        return &vertex_attributes[vertex_attributes.size()-1];
-
+        /* vertex_attributes.push_back(va); */
+        /* return &vertex_attributes[vertex_attributes.size()-1]; */
+        return pushAttribute(va);
     }
     
     /**
-     * @brief TODO: test and document
+     * @brief Fill buffer with attribute data
+     *
+     * @param va Vertex attribute whose buffer is meant to be filled.
+     * @param attrib Array with new attribute data.
      */
     void fillBufferWithAttribute( VertexAttribute &va, const std::vector<float> &attrib )
     {
@@ -1266,13 +1298,9 @@ public:
     }
 
     /**
-     * @brief TODO: test and document
+     * @brief Loads a new vertex attribute, substituting an older attribute if of the same name
      *
-     * Properly change the createAttribute#() methods
-     * Update Mesh::setColor() to check whether an "in_Color" attribute is already present and clear it?
-     *
-     * @param name Name of the attribute.
-     * @param attrib Array with new attribute.
+     * @param va Vertex attribute to store.
      * @return Pointer to created attribute
      */
     VertexAttribute* pushAttribute( VertexAttribute &va )
@@ -1394,12 +1422,14 @@ public:
         VertexAttribute va (name, attrib.size()/2, 2, GL_FLOAT);
 
         // fill buffer with attribute data
-        va.bind();
-        glBufferData(va.getArrayType(), va.getSize()*va.getElementSize()*va.getTypeSize(), attrib.data(), GL_STATIC_DRAW);
-        va.unbind();
+        /* va.bind(); */
+        /* glBufferData(va.getArrayType(), va.getSize()*va.getElementSize()*va.getTypeSize(), attrib.data(), GL_STATIC_DRAW); */
+        /* va.unbind(); */
+        fillBufferWithAttribute(va, attrib);
 
-        vertex_attributes.push_back(va);
-        return &vertex_attributes[vertex_attributes.size()-1];
+        /* vertex_attributes.push_back(va); */
+        /* return &vertex_attributes[vertex_attributes.size()-1]; */
+        return pushAttribute(va);
     }
 
 	/**
@@ -1412,12 +1442,14 @@ public:
     VertexAttribute* createAttribute( const string name, const int element_size, const ulong size )
 	{
 		VertexAttribute va( name, size, element_size, GL_FLOAT );
-		vertex_attributes.push_back(va);
 		
 		va.bind();
 		glBufferData( va.getArrayType(), va.getSize() * va.getElementSize() * va.getTypeSize(), NULL, GL_DYNAMIC_DRAW );
+        // JD: why not unbind?
 		
-		return &vertex_attributes.back();
+		/* vertex_attributes.push_back(va); */
+		/* return &vertex_attributes.back(); */
+        return pushAttribute(va);
 	}
     
 

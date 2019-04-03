@@ -87,7 +87,7 @@ public:
         directcolor_shader.setUniform("modelMatrix", mesh.getShapeModelMatrix());
         directcolor_shader.setUniform("viewMatrix", camera.getViewMatrix());
         directcolor_shader.setUniform("has_color", mesh.hasAttribute("in_Color"));
-		directcolor_shader.setUniform("default_color", default_color);
+		directcolor_shader.setUniform("default_color", mesh.getColor()); // JD: use mesh default colour instead of shader's
 
         mesh.setAttributeLocation(directcolor_shader);
 

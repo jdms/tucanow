@@ -178,6 +178,8 @@ public:
 
         mesh.setAttributeLocation(phong_shader);
 
+        // JD: let's be sane and allow rendering multiple meshes
+        glEnable(GL_DEPTH_TEST);
         mesh.render();
 
         phong_shader.unbind();
