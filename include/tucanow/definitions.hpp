@@ -22,6 +22,11 @@ enum class ObjectShader {
     Phong
 };
 
+enum class SceneLight {
+    SingleDirectional,
+    Headlight
+};
+
 } // namespace tucanow
 
 

@@ -101,7 +101,7 @@ target_link_libraries(tucanow
     GLEW::GLEW
     )
 
-target_compile_features(tucanow PUBLIC cxx_std_11)
+target_compile_features(tucanow PUBLIC cxx_std_14)
 
 # MSVC (as recently as version 19.15.26729) throws hundreds of warnings from
 # it's own implementation of the STL -- CMake's SYSTEM directive seems
