@@ -133,88 +133,107 @@ class Scene
          * @brief Alternate between wireframe and default shading
          */
         void toggleRenderWireframe();
+
+        /**
+         * @brief Set the bounding box
+         *
+         * @param bbox_origin Bounding box's origin
+         * @param bbox_size Bounding box's size
+         */
+        bool setBoundingBox( std::array<float, 3> bbox_origin, std::array<float, 3> bbox_size );
+
         /**
          * @brief Load a mesh to visualize
          *
+         * @param object_id Object index (integer valued)
          * @param vertices Mesh vertices (must be non-empty)
          * @param indices Mesh triangles (vector of indices on the vertices' list)
          * @param vertex_normals Normals per vertex
          *
          * @return True if mesh was set correctly
          */
-        bool setMesh(
+        bool loadMesh(
+                int object_id,
                 const std::vector<float> &vertices, 
                 const std::vector<unsigned int> &indices = {}, 
                 const std::vector<float> &vertex_normals = {}
                 );
 
         /**
-         * @brief Set mesh's single colour -- does not affect mesh loaded from a ply file
-         *
-         * @param r Intensity of red
-         * @param g Intensity of green
-         * @param b Intensity of blue
-         * @param a Intensity of alpha (usually opacity)
-         */
-        void setMeshColor(float r, float g, float b, float a = 1.f);
-
-        /**
-         * @brief Set mesh's single colour -- does not affect mesh loaded from a ply file
-         *
-         * Overloaded method
-         *
-         * @param r Intensity of red
-         * @param g Intensity of green
-         * @param b Intensity of blue
-         * @param a Intensity of alpha (usually opacity)
-         */
-        void setMeshColor(int r, int g, int b, int a = 255);
-
-        /**
-         * @brief Set mesh's RGB colours per vertex -- does not affect mesh loaded from a ply file
-         *
-         * @param colors Vector of RGB colours per vertex
-         *
-         * @return True if colours vector size is a multiple of 3
-         */
-        bool setMeshColorsRGB(std::vector<float> &colors);
-
-        /**
-         * @brief Set mesh's RGB colours per vertex -- does not affect mesh loaded from a ply file
-         *
-         * @param colors Vector of RGBA colours per vertex
-         *
-         * @return True if colours vector size is a multiple of 4
-         */
-        bool setMeshColorsRGBA(std::vector<float> &colors);
-
-        /**
-         * @brief Set texture coordinates (u,v) as a vertex attribute.
-         *
-         * @param texture Texture coordinates array.
-         *
-         * @return True if texture vector is multiple of 2, false otherwise.
-         */
-        bool setMeshTexCoords(std::vector<float> &texture);
-
-        /**
          * @brief Open a Ply mesh file
          *
+         * @param object_id Object index (integer valued)
          * @param filename Name of file to open
          *
          * @return True if mesh was loaded successfully
          */
-        bool loadMeshFromPLY(std::string filename);
+        bool loadPLY(int object_id, std::string filename);
+
+        /**
+         * @brief Set object's single colour -- does not affect mesh loaded from a ply file
+         *
+         * @param object_id Object index (integer valued)
+         * @param r Intensity of red
+         * @param g Intensity of green
+         * @param b Intensity of blue
+         * @param a Intensity of alpha (usually opacity)
+         */
+        bool setObjectColor(int object_id, float r, float g, float b, float a = 1.f);
+
+        /**
+         * @brief Set object's single colour -- does not affect mesh loaded from a ply file
+         *
+         * Overloaded method
+         *
+         * @param object_id Object index (integer valued)
+         * @param r Intensity of red
+         * @param g Intensity of green
+         * @param b Intensity of blue
+         * @param a Intensity of alpha (usually opacity)
+         */
+        bool setObjectColor(int object_id, int r, int g, int b, int a = 255);
+
+        /**
+         * @brief Set mesh's RGB colours per vertex -- does not affect mesh loaded from a ply file
+         *
+         * @param object_id Object index (integer valued)
+         * @param colors Vector of RGB colours per vertex
+         *
+         * @return True if colours vector size is a multiple of 3
+         */
+        bool setObjectColorsRGB(int object_id, std::vector<float> &colors);
+
+        /**
+         * @brief Set mesh's RGB colours per vertex -- does not affect mesh loaded from a ply file
+         *
+         * @param object_id Object index (integer valued)
+         * @param colors Vector of RGBA colours per vertex
+         *
+         * @return True if colours vector size is a multiple of 4
+         */
+        bool setObjectColorsRGBA(int object_id, std::vector<float> &colors);
+
+        /**
+         * @brief Set texture coordinates (u,v) as a vertex attribute.
+         *
+         * @param object_id Object index (integer valued)
+         * @param texture Texture coordinates array.
+         *
+         * @return True if texture vector is multiple of 2, false otherwise.
+         */
+        bool setMeshTextureCoordinates(int object_id, std::vector<float> &texture);
 
         /**
          * @brief Sets a texture for the model
          *
          * Mesh must have tex coords to work properly
+         *
+         * @param object_id Object index (integer valued)
          * @param tex_file Texture filename
          *
          * @return True if texture file was loaded correctly
          */
-        bool setModelTexture(std::string tex_file);
+        bool setMeshTexture(int object_id, std::string tex_file);
 
         /**
          * @brief Place light source direction at the trackball camera direction
@@ -271,6 +290,20 @@ class Scene
         void stopTranslateCamera();
 
         /**
+         * @brief Change camera focus to track the bounding box
+         */
+        void focusCameraOnBoundingBox();
+
+        /**
+         * @brief Change camera focus to track a particular object
+         *
+         * @param object_id Object index (integer valued)
+         *
+         * @return True if object exists
+         */
+        bool focusCameraOnObject(int object_id);
+
+        /**
          * @brief Accumulate sequence of increments to rotate light 
          *
          * @param xpos Mouse x position
@@ -286,11 +319,15 @@ class Scene
     protected:
         std::unique_ptr<SceneImpl> pimpl; ///<-- Tucano data
 
+        SceneImpl& Impl();
+        const SceneImpl& Impl() const;
+
         /** @relates tucanow::Gui
          * */
         friend class Gui;
 
     private:
+        std::array<float, 3> bbox_origin, bbox_size;
         bool render_wireframe = false; ///<-- Controls whether wireframe or default rendering is used
 
         bool headlight_camera = true; ///<-- Controls whether a headlight or a fixed light is used

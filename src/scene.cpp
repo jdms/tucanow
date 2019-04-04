@@ -22,6 +22,16 @@ Scene::~Scene() = default;
 Scene::Scene(Scene &&) = default;
 Scene& Scene::operator=(Scene &&) = default;
 
+SceneImpl& Scene::Impl()
+{
+    return *pimpl;
+}
+
+const SceneImpl& Scene::Impl() const
+{
+    return *pimpl;
+}
+
 /* void Scene::initialize(int width, int height, std::string assets_dir /1* = "../samples/assets/" *1/) */
 void Scene::initialize(int width, int height)
 {
@@ -52,25 +62,32 @@ void Scene::initialize(int width, int height)
     glEnable(GL_DEPTH_TEST);
 }
 
-void Scene::render(void)
+void Scene::render()
 {
     glClearColor(
-            pimpl->clear_color[0], 
-            pimpl->clear_color[1], 
-            pimpl->clear_color[2],
-            pimpl->clear_color[3]
+            Impl().clear_color[0],
+            Impl().clear_color[1],
+            Impl().clear_color[2],
+            Impl().clear_color[3]
         );
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-    if ( render_wireframe )
-    {
-        pimpl->wireframe.render(pimpl->mesh, pimpl->camera, pimpl->light);
-    }
-    else
-    {
+    /* if ( render_wireframe ) */
+    /* { */
+    /*     pimpl->wireframe.render(pimpl->mesh, pimpl->camera, pimpl->light); */
+    /* } */
+    /* else */
+    /* { */
         pimpl->phong.render(pimpl->mesh, pimpl->camera, pimpl->light);
+    /* } */
+
+    for ( auto &entry : Impl().objects )
+    {
+        Impl().render(entry.second.get());
+
     }
-    pimpl->camera.render();
+
+    Impl().camera.render();
 }
 
 void Scene::renderWireframe(bool wireframe)
@@ -98,7 +115,7 @@ void Scene::toggleRenderWireframe()
 
 void Scene::setClearColor(float r, float g, float b, float a)
 {
-    pimpl->clear_color = Eigen::Vector4f(r, g, b, a);
+    Impl().clear_color = Eigen::Vector4f(r, g, b, a);
 }
 
 void Scene::setClearColor(int r, int g, int b, int a)
@@ -106,8 +123,44 @@ void Scene::setClearColor(int r, int g, int b, int a)
     setClearColor((float)(r)/255.0f, (float)(g)/255.0f, (float)(b)/255.0f, (float)(a)/255.0f);
 }
 
-bool Scene::setMesh(const std::vector<float> &vertices, const std::vector<GLuint> &indices, const std::vector<float> &vertex_normals)
+bool Scene::setBoundingBox( std::array<float, 3> bbox_origin, std::array<float, 3> bbox_size )
 {
+    bool success = true;
+
+    success &= bbox_size[0] > 0.0f;
+    success &= bbox_size[1] > 0.0f;
+    success &= bbox_size[2] > 0.0f;
+
+    if ( !success )
+    {
+        return false;
+    }
+
+    Impl().bbox_origin = bbox_origin;
+    Impl().bbox_size = bbox_size;
+
+    Impl().setBBoxCentroidAndScale();
+
+    return success;
+}
+
+bool Scene::loadMesh( int object_id,
+        const std::vector<float> &vertices, 
+        const std::vector<unsigned int> &indices, 
+        const std::vector<float> &vertex_normals
+        )
+{
+    if ( vertices.empty() )
+    {
+        /* std::cout << "\nError: vertices.empty() != true\n"; */
+        return false;
+    }
+
+    if ( indices.empty() || (indices.size() % 3 != 0) )
+    {
+        return false;
+    }
+
     if ( !vertex_normals.empty() )
     if ( vertices.size() != vertex_normals.size() )
     {
@@ -115,155 +168,56 @@ bool Scene::setMesh(const std::vector<float> &vertices, const std::vector<GLuint
         return false;
     }
     
-    if ( vertices.empty() )
+    auto object = Impl().createObject(object_id);
+    if ( object == nullptr )
     {
-        /* std::cout << "\nError: vertices.empty() != true\n"; */
         return false;
     }
 
-    if ( pimpl->mesh_t != MeshType::NONE )
+    // TODO: destroy object in case of failure
+    bool success = object->mesh.loadVertices(vertices);
+    if ( !success )
     {
-        pimpl->mesh.reset();
+        /* object->mesh.normalizeModelMatrix(); */
+        /* std::cout << "\nGot mesh\n"; */
+        return false;
     }
+    object->object_type = ObjectType::PointCloud;
+    object->object_shader = ObjectShader::DirectColor;
 
-    bool success = pimpl->mesh.loadVertices(vertices);
-    /* if ( success ) */
-    /*     std::cout << "\nGot vertices\n"; */
+    object->mesh.loadIndices(indices);
+    // TODO: TriangleMesh iff loadIndices returns true
+    object->object_type = ObjectType::TriangleMesh;
 
+    /*     std::cout << "\nGot mesh\n"; */
 
-    if ( success && !indices.empty() )
-    {
-        pimpl->mesh.loadIndices(indices);
-        /* std::cout << "\nGot indices\n"; */
-    }
 
     if ( success && !vertex_normals.empty() )
     {
-        pimpl->mesh.loadNormals(vertex_normals);
+        object->mesh.loadNormals(vertex_normals);
+        object->object_shader = ObjectShader::Phong;
         /* std::cout << "\nGot normals\n"; */
-    }
-
-    if ( success )
-    {
-        pimpl->mesh.normalizeModelMatrix();
-        pimpl->mesh_t = MeshType::FROM_VECTORS;
-        /* std::cout << "\nGot mesh\n"; */
     }
 
     return success;
 }
 
-/* bool Scene::setVertices(std::vector<float> &vertices) */
-/* { */
-/*     if ( pimpl->mesh_t != MeshType::NONE ) */
-/*     { */
-/*         pimpl->mesh.reset(); */
-/*     } */
-
-/*     if ( vertices.empty() ) */
-/*     { */
-/*         return false; */
-/*     } */
-
-/*     bool success = pimpl->mesh.loadVertices(vertices); */
-/*     if ( success ) */
-/*     { */
-/*         pimpl->mesh.normalizeModelMatrix(); */
-/*         mesh_t = MeshType::FROM_VECTORS; */
-/*     } */
-
-/*     return success; */
-/* } */
-
-/* bool Scene::setIndices(std::vector<unsigned int> &indices) */
-/* { */
-/*     if ( mesh_t != MeshType::FROM_VECTORS ) */
-/*     { */
-/*         return false; */
-/*     } */
-
-/*     if ( indices.empty() ) */
-/*     { */
-/*         return false; */
-/*     } */
-
-/*     pimpl->mesh.loadIndices(indices); */
-
-/*     return true; */
-/* } */
-
-/* bool Scene::setNormals(std::vector<float> &normals) */
-/* { */
-/*     if ( mesh_t != MeshType::FROM_VECTORS ) */
-/*     { */
-/*         return false; */
-/*     } */
-
-/*     if ( normals.empty() ) */
-/*     { */
-/*         return false; */
-/*     } */
-
-/*     return pimpl->mesh.loadNormals(normals); */
-/* } */
-
-void Scene::setMeshColor(float r, float g, float b, float a)
+bool Scene::loadPLY(int object_id, std::string filename)
 {
-    /* pimpl->phong.setDefaultColor(Eigen::Vector4f(r, g, b, a)); */
-    pimpl->mesh.setColor(Eigen::Vector4f(r, g, b, a));
-}
-
-void Scene::setMeshColor(int r, int g, int b, int a)
-{
-    setMeshColor((float)(r)/255.0f, (float)(g)/255.0f, (float)(b)/255.0f, (float)(a)/255.0f);
-}
-
-bool Scene::setMeshColorsRGB(std::vector<float> &colors)
-{
-    if ( pimpl->mesh_t != MeshType::FROM_VECTORS )
+    auto object = Impl().createObject(object_id);
+    if ( object == nullptr )
     {
         return false;
     }
 
-    return pimpl->mesh.loadColorsRGB(colors);
-}
-
-bool Scene::setMeshColorsRGBA(std::vector<float> &colors)
-{
-    if ( pimpl->mesh_t != MeshType::FROM_VECTORS )
-    {
-        return false;
-    }
-
-    return pimpl->mesh.loadColorsRGBA(colors);
-}
-
-bool Scene::setMeshTexCoords(std::vector<float> &texture)
-{
-    if ( pimpl->mesh_t != MeshType::FROM_VECTORS )
-    {
-        return false;
-    }
-
-    if ( texture.empty() )
-    {
-        return false;
-    }
-
-    return pimpl->mesh.loadTexCoords(texture);
-}
-
-bool Scene::loadMeshFromPLY(std::string filename)
-{
-    if ( pimpl->mesh_t != MeshType::NONE )
-    {
-        pimpl->mesh.reset();
-    }
-
-    bool success = Tucano::MeshImporter::loadPlyFile(&pimpl->mesh, filename);
+    bool success = Tucano::MeshImporter::loadPlyFile(&object->mesh, filename);
     if (success)
     {
-        pimpl->mesh.normalizeModelMatrix();
+        object->object_shader = ObjectShader::Phong;
+        object->object_type = ObjectType::PLY;
+
+        /* object->mesh.normalizeModelMatrix(); */
+
         std::string tex_file = Tucano::MeshImporter::getPlyTextureFile(filename);
         if (!tex_file.empty())
         {
@@ -271,23 +225,82 @@ bool Scene::loadMeshFromPLY(std::string filename)
             string dir = filename.substr(0, found);
             string tex_file_with_dir = dir + "/" + tex_file;
  
-            setModelTexture(tex_file_with_dir);
+            setMeshTexture(object_id, tex_file_with_dir);
         }
-
-        pimpl->mesh_t = MeshType::FROM_FILE;
     }
 
     return success;
 }
 
-bool Scene::setModelTexture(std::string tex_file)
+bool Scene::setObjectColor(int object_id, float r, float g, float b, float a)
 {
+    auto object = Impl().Object(object_id);
+    if ( object == nullptr )
+    {
+        return false;
+    }
+    object->mesh.setColor(Eigen::Vector4f(r, g, b, a));
+
+    return true;
+}
+
+bool Scene::setObjectColor(int object_id, int r, int g, int b, int a)
+{
+    return setObjectColor(object_id, (float)(r)/255.0f, (float)(g)/255.0f, (float)(b)/255.0f, (float)(a)/255.0f);
+}
+
+bool Scene::setObjectColorsRGB(int object_id, std::vector<float> &colors)
+{
+    auto object = Impl().Object(object_id);
+    if ( object == nullptr )
+    {
+        return false;
+    }
+
+    return object->mesh.loadColorsRGB(colors);
+}
+
+bool Scene::setObjectColorsRGBA(int object_id, std::vector<float> &colors)
+{
+    auto object = Impl().Object(object_id);
+    if ( object == nullptr )
+    {
+        return false;
+    }
+
+    return object->mesh.loadColorsRGBA(colors);
+}
+
+bool Scene::setMeshTextureCoordinates(int object_id, std::vector<float> &texture)
+{
+    if ( texture.empty() )
+    {
+        return false;
+    }
+
+    auto object = Impl().Object(object_id);
+    if ( object == nullptr )
+    {
+        return false;
+    }
+
+    return object->mesh.loadTexCoords(texture);
+}
+
+bool Scene::setMeshTexture(int object_id, std::string tex_file)
+{
+    auto object = Impl().Object(object_id);
+    if ( object == nullptr )
+    {
+        return false;
+    }
+
     Tucano::Texture texture;
     bool success = Tucano::ImageImporter::loadImage(tex_file, &texture);
     if (success)
     {        
-        pimpl->phong.setTexture(texture);
-        pimpl->phong.getTexture()->setTexParameters( GL_CLAMP, GL_CLAMP, GL_LINEAR, GL_LINEAR );
+        object->texture = texture;
+        object->texture.setTexParameters( GL_CLAMP, GL_CLAMP, GL_LINEAR, GL_LINEAR );
     }
 
     return success;
@@ -374,6 +387,25 @@ void Scene::translateCamera(float xpos, float ypos)
 void Scene::stopTranslateCamera()
 {
     pimpl->camera.endTranslation();
+}
+
+void Scene::focusCameraOnBoundingBox()
+{
+    Impl().setBBoxCentroidAndScale();
+}
+
+bool Scene::focusCameraOnObject(int object_id)
+{
+    auto object = Impl().Object(object_id);
+    if ( object == nullptr )
+    {
+        return false;
+    }
+
+    Impl().model_centroid = object->mesh.getCentroid();
+    Impl().model_scale = object->mesh.getNormalizationScale();
+
+    return true;
 }
 
 void Scene::rotateLight(float xpos, float ypos)
