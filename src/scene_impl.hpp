@@ -27,8 +27,6 @@
 #include "tucanow/definitions.hpp"
 #include "tucanow/scene.hpp"
 
-#include "prettyprint.hpp"
-
 namespace tucanow {
 
 
@@ -130,7 +128,6 @@ struct SceneImpl
             p6[0], p6[1], p6[2],
             p7[0], p7[1], p7[2]
         }};
-        std::cout << bbox_vertices << "\n";
 
         std::vector<unsigned int> bbox_indices = {
             0, 1,
@@ -146,7 +143,6 @@ struct SceneImpl
             2, 6,
             3, 7
         };
-        std::cout << bbox_indices << "\n";
 
         bbox_boundary.mesh.reset();
         bbox_boundary.mesh.loadVertices(bbox_vertices);
