@@ -32,7 +32,11 @@ void Gui::initialize(int width, int height, std::string assets_dir)
     gui->add(&pimpl->groupbox);
 
     pimpl->reload_button.setPosition( 10, 10 + yoffset );
-    pimpl->reload_button.onClick ( [&](){scene.pimpl->phong.reloadShaders();} );
+    pimpl->reload_button.onClick ( [&]() {
+            scene.pimpl->phong.reloadShaders();
+            scene.pimpl->wireframe.reloadShaders();
+            scene.pimpl->directcolor.reloadShaders();
+            } );
     pimpl->reload_button.setTexture ( assets_dir + "reload_button.pam" );
     pimpl->reload_button.setDimensionsFromHeight(30);
     pimpl->groupbox.add(&pimpl->reload_button);
