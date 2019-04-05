@@ -42,6 +42,7 @@ void Scene::initialize(int width, int height)
         height = 1;
 
     // initialize the shader effect (if TUCANOSHADERDIR is set, no need to set dir before init)
+    pimpl->directcolor.initialize();
     pimpl->phong.initialize();
     pimpl->wireframe.initialize();
 
@@ -182,15 +183,10 @@ bool Scene::loadMesh( int object_id,
         /* std::cout << "\nGot mesh\n"; */
         return false;
     }
-    object->object_type = ObjectType::PointCloud;
-    object->object_shader = ObjectShader::DirectColor;
-
     object->mesh.loadIndices(indices);
-    // TODO: TriangleMesh iff loadIndices returns true
+    object->object_shader = ObjectShader::DirectColor;
     object->object_type = ObjectType::TriangleMesh;
-
     /*     std::cout << "\nGot mesh\n"; */
-
 
     if ( success && !vertex_normals.empty() )
     {
