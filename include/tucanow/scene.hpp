@@ -167,7 +167,7 @@ class Scene
          *
          * @return True if mesh was loaded successfully
          */
-        bool loadPLY(int object_id, std::string filename);
+        bool loadPLY(int object_id, const std::string &filename);
 
         /**
          * @brief Set object's single colour -- does not affect mesh loaded from a ply file
@@ -201,7 +201,7 @@ class Scene
          *
          * @return True if colours vector size is a multiple of 3
          */
-        bool setObjectColorsRGB(int object_id, std::vector<float> &colors);
+        bool setObjectColorsRGB(int object_id, const std::vector<float> &colors);
 
         /**
          * @brief Set mesh's RGB colours per vertex -- does not affect mesh loaded from a ply file
@@ -211,17 +211,17 @@ class Scene
          *
          * @return True if colours vector size is a multiple of 4
          */
-        bool setObjectColorsRGBA(int object_id, std::vector<float> &colors);
+        bool setObjectColorsRGBA(int object_id, const std::vector<float> &colors);
 
         /**
          * @brief Set texture coordinates (u,v) as a vertex attribute.
          *
          * @param object_id Object index (integer valued)
-         * @param texture Texture coordinates array.
+         * @param texture_coords Texture coordinates array.
          *
          * @return True if texture vector is multiple of 2, false otherwise.
          */
-        bool setMeshTextureCoordinates(int object_id, std::vector<float> &texture);
+        bool setMeshTextureCoordinates(int object_id, const std::vector<float> &texture_coords);
 
         /**
          * @brief Sets a texture for the model
@@ -233,7 +233,7 @@ class Scene
          *
          * @return True if texture file was loaded correctly
          */
-        bool setMeshTexture(int object_id, std::string tex_file);
+        bool setMeshTexture(int object_id, const std::string &tex_file);
 
         /**
          * @brief Place light source direction at the trackball camera direction

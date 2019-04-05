@@ -202,7 +202,7 @@ bool Scene::loadMesh( int object_id,
     return success;
 }
 
-bool Scene::loadPLY(int object_id, std::string filename)
+bool Scene::loadPLY(int object_id, const std::string &filename)
 {
     auto object = Impl().createObject(object_id);
     if ( object == nullptr )
@@ -249,7 +249,7 @@ bool Scene::setObjectColor(int object_id, int r, int g, int b, int a)
     return setObjectColor(object_id, (float)(r)/255.0f, (float)(g)/255.0f, (float)(b)/255.0f, (float)(a)/255.0f);
 }
 
-bool Scene::setObjectColorsRGB(int object_id, std::vector<float> &colors)
+bool Scene::setObjectColorsRGB(int object_id, const std::vector<float> &colors)
 {
     auto object = Impl().Object(object_id);
     if ( object == nullptr )
@@ -260,7 +260,7 @@ bool Scene::setObjectColorsRGB(int object_id, std::vector<float> &colors)
     return object->mesh.loadColorsRGB(colors);
 }
 
-bool Scene::setObjectColorsRGBA(int object_id, std::vector<float> &colors)
+bool Scene::setObjectColorsRGBA(int object_id, const std::vector<float> &colors)
 {
     auto object = Impl().Object(object_id);
     if ( object == nullptr )
@@ -271,7 +271,7 @@ bool Scene::setObjectColorsRGBA(int object_id, std::vector<float> &colors)
     return object->mesh.loadColorsRGBA(colors);
 }
 
-bool Scene::setMeshTextureCoordinates(int object_id, std::vector<float> &texture)
+bool Scene::setMeshTextureCoordinates(int object_id, const std::vector<float> &texture)
 {
     if ( texture.empty() )
     {
@@ -287,7 +287,7 @@ bool Scene::setMeshTextureCoordinates(int object_id, std::vector<float> &texture
     return object->mesh.loadTexCoords(texture);
 }
 
-bool Scene::setMeshTexture(int object_id, std::string tex_file)
+bool Scene::setMeshTexture(int object_id, const std::string &tex_file)
 {
     auto object = Impl().Object(object_id);
     if ( object == nullptr )
