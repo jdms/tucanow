@@ -97,7 +97,7 @@ target_include_directories(tucanow SYSTEM
 target_link_libraries(tucanow 
     PUBLIC
     OpenGL::GL Eigen3::Eigen
-    PRIVATE
+    # PRIVATE
     GLEW::GLEW
     )
 
