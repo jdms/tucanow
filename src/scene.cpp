@@ -13,8 +13,11 @@ Scene::Scene() //: pimpl(new SceneImpl)
 
     pimpl.reset(new SceneImpl);
 
-    // Set light cyan as the background colour
-    setClearColor(224, 255, 255, 255);
+    /* // Set light cyan as the background colour */
+    /* setClearColor(224, 255, 255, 255); */
+    setClearColor(255, 255, 255, 255);
+
+    Impl().setBBox();
 }
 
 Scene::~Scene() = default;
@@ -73,14 +76,10 @@ void Scene::render()
         );
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-    /* if ( render_wireframe ) */
-    /* { */
-    /*     pimpl->wireframe.render(pimpl->mesh, pimpl->camera, pimpl->light); */
-    /* } */
-    /* else */
-    /* { */
-        pimpl->phong.render(pimpl->mesh, pimpl->camera, pimpl->light);
-    /* } */
+    if ( Impl().render_bbox_boundary )
+    {
+        Impl().render( &Impl().bbox_boundary );
+    }
 
     for ( auto &entry : Impl().objects )
     {
@@ -140,12 +139,82 @@ bool Scene::setBoundingBox( std::array<float, 3> bbox_origin, std::array<float, 
     Impl().bbox_origin = bbox_origin;
     Impl().bbox_size = bbox_size;
 
-    Impl().setBBoxCentroidAndScale();
+    Impl().setBBox();
 
     return success;
 }
 
-bool Scene::loadMesh( int object_id,
+bool Scene::loadPointCloud(
+        int object_id,
+        const std::vector<float> &vertices 
+        )
+{
+    if ( vertices.empty() )
+    {
+        /* std::cout << "\nError: vertices.empty() != true\n"; */
+        return false;
+    }
+
+    auto object = Impl().createObject(object_id);
+    if ( object == nullptr )
+    {
+        return false;
+    }
+
+    // TODO: destroy object in case of failure
+    bool success = object->mesh.loadVertices(vertices);
+    if ( !success )
+    {
+        /* object->mesh.normalizeModelMatrix(); */
+        /* std::cout << "\nGot mesh\n"; */
+        return false;
+    }
+    object->shader = ObjectShader::DirectColor;
+    /*     std::cout << "\nGot mesh\n"; */
+
+    return success;
+}
+
+bool Scene::loadCurveMesh( int object_id,
+        const std::vector<float> &vertices,
+        const std::vector<unsigned int> &indices
+        )
+{
+    if ( vertices.empty() )
+    {
+        /* std::cout << "\nError: vertices.empty() != true\n"; */
+        return false;
+    }
+
+    if ( indices.empty() || (indices.size() % 3 != 0) )
+    {
+        return false;
+    }
+
+    auto object = Impl().createObject(object_id);
+    if ( object == nullptr )
+    {
+        return false;
+    }
+
+    // TODO: destroy object in case of failure
+    bool success = object->mesh.loadVertices(vertices);
+    if ( !success )
+    {
+        /* object->mesh.normalizeModelMatrix(); */
+        /* std::cout << "\nGot mesh\n"; */
+        return false;
+    }
+    object->mesh.loadIndices(indices);
+    object->mesh.selectPrimitive(Tucano::Mesh::CURVE);
+    object->shader = ObjectShader::DirectColor;
+    object->type = ObjectType::CurveMesh;
+    /*     std::cout << "\nGot mesh\n"; */
+
+    return success;
+}
+
+bool Scene::loadTriangleMesh( int object_id,
         const std::vector<float> &vertices, 
         const std::vector<unsigned int> &indices, 
         const std::vector<float> &vertex_normals
@@ -184,14 +253,14 @@ bool Scene::loadMesh( int object_id,
         return false;
     }
     object->mesh.loadIndices(indices);
-    object->object_shader = ObjectShader::DirectColor;
-    object->object_type = ObjectType::TriangleMesh;
+    object->shader = ObjectShader::DirectColor;
+    object->type = ObjectType::TriangleMesh;
     /*     std::cout << "\nGot mesh\n"; */
 
     if ( success && !vertex_normals.empty() )
     {
         object->mesh.loadNormals(vertex_normals);
-        object->object_shader = ObjectShader::Phong;
+        object->shader = ObjectShader::Phong;
         /* std::cout << "\nGot normals\n"; */
     }
 
@@ -209,8 +278,8 @@ bool Scene::loadPLY(int object_id, const std::string &filename)
     bool success = Tucano::MeshImporter::loadPlyFile(&object->mesh, filename);
     if (success)
     {
-        object->object_shader = ObjectShader::Phong;
-        object->object_type = ObjectType::PLY;
+        object->shader = ObjectShader::Phong;
+        object->type = ObjectType::PLY;
 
         /* object->mesh.normalizeModelMatrix(); */
 
@@ -387,7 +456,7 @@ void Scene::stopTranslateCamera()
 
 void Scene::focusCameraOnBoundingBox()
 {
-    Impl().setBBoxCentroidAndScale();
+    Impl().setBBox();
 }
 
 bool Scene::focusCameraOnObject(int object_id)

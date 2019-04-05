@@ -144,7 +144,36 @@ class Scene
         bool setBoundingBox( std::array<float, 3> bbox_origin, std::array<float, 3> bbox_size );
 
         /**
-         * @brief Load a mesh to visualize
+         * @brief Load a point cloud to visualize
+         *
+         * @param object_id Object index (integer valued)
+         * @param vertices Point cloud vertices (must be non-empty)
+         *
+         * @return True if mesh was set correctly
+         */
+        bool loadPointCloud(
+                int object_id,
+                const std::vector<float> &vertices 
+                );
+
+        /**
+         * @brief Load a curve mesh to visualize
+         *
+         * @param object_id Object index (integer valued)
+         * @param vertices Mesh vertices (must be non-empty)
+         * @param indices Mesh segments (vector of indices on the vertices' list)
+         *
+         * @return True if mesh was set correctly
+         */
+
+        bool loadCurveMesh(
+                int object_id,
+                const std::vector<float> &vertices, 
+                const std::vector<unsigned int> &indices = {}
+                );
+
+        /**
+         * @brief Load a triangle mesh to visualize
          *
          * @param object_id Object index (integer valued)
          * @param vertices Mesh vertices (must be non-empty)
@@ -153,10 +182,10 @@ class Scene
          *
          * @return True if mesh was set correctly
          */
-        bool loadMesh(
+        bool loadTriangleMesh(
                 int object_id,
                 const std::vector<float> &vertices, 
-                const std::vector<unsigned int> &indices = {}, 
+                const std::vector<unsigned int> &indices = {},
                 const std::vector<float> &vertex_normals = {}
                 );
 

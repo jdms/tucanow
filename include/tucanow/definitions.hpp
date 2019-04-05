@@ -11,6 +11,7 @@ namespace tucanow {
 enum class ObjectType {
     PointCloud,
     TriangleMesh,
+    CurveMesh,
     PLY,
     OBJ
 };
