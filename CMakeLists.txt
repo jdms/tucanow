@@ -75,8 +75,10 @@ endif()
 
 set(TUCANOW_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/scene.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/scene_impl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/misc.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/sphere.cpp
     )
 
 add_library(tucanow ${TUCANOW_LIBRARY_TYPE} ${TUCANOW_SOURCES})

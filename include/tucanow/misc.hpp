@@ -1,5 +1,5 @@
-#ifndef __TUCANOW_MISC__
-#define __TUCANOW_MISC__
+#ifndef TUCANOW_MISC
+#define TUCANOW_MISC
 
 /** @file misc.hpp tucanow/misc.hpp
  * */

@@ -1,5 +1,5 @@
-#ifndef __TUCANOW_GUI__
-#define __TUCANOW_GUI__
+#ifndef TUCANOW_GUI
+#define TUCANOW_GUI
 
 /** @file gui.hpp tucanow/gui.hpp
  * */

@@ -1,5 +1,5 @@
-#ifndef __TUCANOW_SCENE__
-#define __TUCANOW_SCENE__
+#ifndef TUCANOW_SCENE
+#define TUCANOW_SCENE
 
 /** @file scene.hpp tucanow/scene.hpp
  * */

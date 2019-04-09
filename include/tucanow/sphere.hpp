@@ -1,5 +1,5 @@
-#ifndef __TUCANOW_SPHERE__
-#define __TUCANOW_SPHERE__
+#ifndef TUCANOW_SPHERE
+#define TUCANOW_SPHERE
 
 
 #include <vector>
