@@ -49,6 +49,7 @@ void Scene::initialize(int width, int height)
 
     // initialize the shader effect (if TUCANOSHADERDIR is set, no need to set dir before init)
     pimpl->directcolor.initialize();
+    pimpl->toon.initialize();
     pimpl->phong.initialize();
     pimpl->wireframe.initialize();
 

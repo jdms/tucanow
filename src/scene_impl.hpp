@@ -1,5 +1,5 @@
-#ifndef __TUCANOW_SCENE_IMPL__
-#define __TUCANOW_SCENE_IMPL__
+#ifndef TUCANOW_SCENE_IMPL
+#define TUCANOW_SCENE_IMPL
 
 
 /** @file scene_impl.hpp src/scene_impl.hpp
@@ -17,6 +17,7 @@
 
 #include <tucano/texture.hpp>
 #include <tucano/effects/directcolor.hpp>
+#include <tucano/effects/toon.hpp>
 #include <tucano/effects/phongshader.hpp>
 #include <tucano/effects/wireframe.hpp>
 #include <tucano/gui/base.hpp>
@@ -59,6 +60,9 @@ struct SceneImpl
 
     /// DirectColor shader effect to render meshes
     Tucano::Effects::DirectColor directcolor;
+
+    /// Toon shader effect to render meshes
+    Tucano::Effects::Toon toon;
 
     /// Phong shader effect to render meshes
     Tucano::Effects::Phong phong;
@@ -194,6 +198,9 @@ struct SceneImpl
             case ObjectShader::Phong:
                 phong.render(ptr->mesh, camera, light, ptr->texture);
                 break;
+
+            case ObjectShader::Toon:
+                toon.render(ptr->mesh, camera, light);
 
             case ObjectShader::DirectColor:
                 directcolor.render(ptr->mesh, camera);
