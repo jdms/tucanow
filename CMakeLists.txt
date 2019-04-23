@@ -48,6 +48,22 @@ if (TUCANOW_BUILD_DOCS)
 endif(TUCANOW_BUILD_DOCS)
 
 
+################################################
+## Use Backward-cpp
+################################################
+
+## option(TUCANOW_BUILD_USING_BACKWARD_CPP "" ON)
+
+## if(UNIX AND NOT APPLE)
+#    # set(LINUX TRUE)
+## endif()
+
+## if(TUCANOW_BUILD_USING_BACKWARD_CPP AND LINUX)
+#    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/src/backward-cpp")
+#    list(APPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/src/backward-cpp")
+#    find_package(Backward)
+## endif()
+
 
 ###############################################
 # External libraries
@@ -77,6 +93,7 @@ set(TUCANOW_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/scene.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/scene_impl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/phong_gui.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/misc.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/sphere.cpp
     )
@@ -85,23 +102,26 @@ add_library(tucanow ${TUCANOW_LIBRARY_TYPE} ${TUCANOW_SOURCES})
 
 target_include_directories(tucanow
     PUBLIC
-    $<INSTALL_INTERFACE:include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
     )
 
 target_include_directories(tucanow SYSTEM
     PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/tucano
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/tucano
     )
 
 target_link_libraries(tucanow 
     PUBLIC
-    OpenGL::GL Eigen3::Eigen
+        OpenGL::GL 
+        Eigen3::Eigen
     # PRIVATE
-    GLEW::GLEW
+        GLEW::GLEW
+        # Backward::Backward
     )
+# add_backward(tucanow)
 
 target_compile_features(tucanow PUBLIC cxx_std_14)
 

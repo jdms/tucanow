@@ -18,7 +18,7 @@ namespace GUI {
 namespace tucanow {
 
 
-struct GuiImpl;
+struct SceneImpl;
 class Scene;
 
 
@@ -116,10 +116,17 @@ class Gui
          *
          * @return Pointer to Tucano::GUI::Base
          */
-        virtual Tucano::GUI::Base* getTucanoGui();
+        Tucano::GUI::Base* getTucanoGui();
+
+        /**
+         * @brief Get a pointer to tucanow::Scene's implementation
+         *
+         * @return Pointer to Tucano::GUI::Base
+         */
+        SceneImpl* getSceneImpl();
 
         Scene& scene; ///<-- Reference to Scene object
-        std::unique_ptr<GuiImpl> pimpl; ///<-- Tucano data
+        std::unique_ptr<Tucano::GUI::Base> pimpl; ///<-- Tucano data
 };
 
 
