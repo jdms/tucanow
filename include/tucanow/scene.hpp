@@ -52,7 +52,7 @@ class Scene
         Scene& operator=(Scene &&);
 
         // TODO: Change from initializer to factory method.
-        std::unique_ptr<Scene> Get(int width, int height);
+        static std::unique_ptr<Scene> Get(int width, int height);
 
         /**
          * @brief Initializes the scene and shaders
@@ -68,9 +68,17 @@ class Scene
          * @brief Set scene viewport
          *
          * @param width Viewport width in pixels
-         * @param height Viewport height in pixels 
+         * @param height Viewport height in pixels
          */
         virtual bool setViewport(int width, int height);
+
+        /**
+         * @brief Get scene viewport
+         *
+         * @param width Viewport width in pixels
+         * @param height Viewport height in pixels
+         */
+        virtual void getViewport(int &width, int &height);
 
         /** @brief Set screen scale for HighDPI screens
          *
@@ -149,7 +157,7 @@ class Scene
          * @param object_id Object index (integer valued)
          * @param vertices Point cloud vertices (must be non-empty)
          *
-         * @return True if mesh was set correctly
+         * @return True if point cloud was set correctly
          */
         bool loadPointCloud(
                 int object_id,

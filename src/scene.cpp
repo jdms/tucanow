@@ -388,6 +388,14 @@ bool Scene::setViewport(int width, int height)
     return true;
 }
 
+void Scene::getViewport(int &width, int &height)
+{
+    Eigen::Vector4f viewport = pimpl->camera.getViewport();
+
+    width = static_cast<int>(viewport[2] - viewport[0]);
+    height = static_cast<int>(viewport[3] - viewport[1]);
+}
+
 void Scene::setHeadlight(bool headligh)
 {
     headlight_camera = headligh;

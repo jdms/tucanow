@@ -18,6 +18,9 @@ Gui::Gui(Scene &s) : scene(s), pimpl( new Tucano::GUI::Base() ) {}
 
 Gui::~Gui() = default;
 
+Gui::Gui(Gui &&) = default;
+
+Gui& Gui::operator=(Gui&&) = default;
 
 void Gui::initialize(int width, int height, std::string assets_dir)
 {
@@ -34,9 +37,14 @@ bool Gui::setViewport(int width, int height)
     auto gui = getTucanoGui();
     gui->setViewportSize (width, height);
 
-    scene.setViewport(width, height);
+    scene.get().setViewport(width, height);
 
     return true;
+}
+
+void Gui::getViewport(int &width, int &height)
+{
+    scene.get().getViewport(width, height);
 }
 
 void Gui::render()
@@ -48,7 +56,7 @@ void Gui::render()
 bool Gui::leftButtonPressed(float xpos, float ypos)
 {
     float scale_width, scale_height;
-    scene.getScreenScale(scale_width, scale_height);
+    scene.get().getScreenScale(scale_width, scale_height);
 
     double scaled_xpos = scale_width * xpos;
     double scaled_ypos = scale_height * ypos;
@@ -60,7 +68,7 @@ bool Gui::leftButtonPressed(float xpos, float ypos)
 bool Gui::leftButtonReleased(float xpos, float ypos)
 {
     float scale_width, scale_height;
-    scene.getScreenScale(scale_width, scale_height);
+    scene.get().getScreenScale(scale_width, scale_height);
 
     double scaled_xpos = scale_width * xpos;
     double scaled_ypos = scale_height * ypos;
@@ -72,7 +80,7 @@ bool Gui::leftButtonReleased(float xpos, float ypos)
 bool Gui::cursorMove(float xpos, float ypos)
 {
     float scale_width, scale_height;
-    scene.getScreenScale(scale_width, scale_height);
+    scene.get().getScreenScale(scale_width, scale_height);
 
     double scaled_xpos = scale_width * xpos;
     double scaled_ypos = scale_height * ypos;
@@ -88,7 +96,7 @@ Tucano::GUI::Base* Gui::getTucanoGui()
 
 SceneImpl* Gui::getSceneImpl()
 {
-    return scene.pimpl.get();
+    return scene.get().pimpl.get();
 }
 
 } //namespace tucanow

@@ -5,6 +5,7 @@
  * */
 
 
+#include <functional>
 #include <memory>
 #include <string>
 
@@ -18,8 +19,8 @@ namespace GUI {
 namespace tucanow {
 
 
-struct SceneImpl;
 class Scene;
+struct SceneImpl;
 
 
 class Gui 
@@ -47,14 +48,14 @@ class Gui
         Gui& operator=(Gui &) = delete;
 
         /**
-         * @brief Deleted move constructor
+         * @brief Default move constructor
          */
-        Gui(Gui &&) = delete;
+        Gui(Gui &&);
 
         /**
-         * @brief Deleted move assignment
+         * @brief Default move assignment
          */
-        Gui& operator=(Gui&&) = delete;
+        Gui& operator=(Gui&&);
 
         /**
          * @brief Initialize the gui and shaders
@@ -74,6 +75,15 @@ class Gui
          * @param height Viewport height
          */
         virtual bool setViewport(int width, int height);
+
+        /**
+         * @brief Get gui's scene viewport
+         *
+         * @param width Viewport width
+         * @param height Viewport height
+         */
+
+        virtual void getViewport(int &width, int &height);
 
         /**
          * @brief Render gui.
@@ -125,7 +135,7 @@ class Gui
          */
         SceneImpl* getSceneImpl();
 
-        Scene& scene; ///<-- Reference to Scene object
+        std::reference_wrapper<Scene> scene; ///<-- Reference to Scene object
         std::unique_ptr<Tucano::GUI::Base> pimpl; ///<-- Tucano data
 };
 
