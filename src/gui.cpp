@@ -13,8 +13,20 @@ namespace tucanow {
 /*         Tucano::GUI::Base gui; */
 /* }; */
 
+std::unique_ptr<tucanow::Gui> Gui::Get(Scene &s)
+{
+    std::unique_ptr<tucanow::Gui> instance = std::unique_ptr<tucanow::Gui>( new tucanow::Gui(s) );
 
-Gui::Gui(Scene &s) : scene(s), pimpl( new Tucano::GUI::Base() ) {}
+    return instance;
+}
+
+Gui::Gui(Scene &s, std::string /* assets_dir */) : scene(s), pimpl( new Tucano::GUI::Base() ) 
+{
+    int width = 1, height = 1;
+    scene.get().getViewport(width, height);
+
+    Gui::setViewport(width, height);
+}
 
 Gui::~Gui() = default;
 
@@ -22,10 +34,21 @@ Gui::Gui(Gui &&) = default;
 
 Gui& Gui::operator=(Gui&&) = default;
 
-void Gui::initialize(int width, int height, std::string assets_dir)
-{
-    setViewport(width, height);
-}
+/**
+ * @brief Initialize the gui and shaders
+ *
+ * Must be called after Glew has been initialized
+ *
+ * @param width Viewport width 
+ * @param height Viewport height 
+ * @param assets_dir Path to dir where gui's assets can be found
+ */
+/* virtual void initialize(int width, int height, std::string assets_dir = "./samples/assets/"); */
+
+/* void Gui::initialize(int width, int height, std::string assets_dir) */
+/* { */
+    /* setViewport(width, height); */
+/* } */
 
 bool Gui::setViewport(int width, int height)
 {
@@ -37,7 +60,7 @@ bool Gui::setViewport(int width, int height)
     auto gui = getTucanoGui();
     gui->setViewportSize (width, height);
 
-    scene.get().setViewport(width, height);
+    /* scene.get().setViewport(width, height); */
 
     return true;
 }

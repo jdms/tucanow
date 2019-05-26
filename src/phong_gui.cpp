@@ -44,6 +44,16 @@ struct PhongGui::PhongGuiImpl
         Tucano::GUI::Label shininess_label;
 };
 
+std::unique_ptr<tucanow::Gui> PhongGui::Get(Scene &s, std::string assets_dir)
+{
+    std::unique_ptr<tucanow::PhongGui> instance = std::unique_ptr<tucanow::PhongGui>( new tucanow::PhongGui(s) );
+
+    int width, height;
+    s.getViewport(width, height);
+    instance->initialize(width, height, assets_dir);
+
+    return instance;
+}
 
 PhongGui::PhongGui(Scene &s) : Gui::Gui(s), pimpl(new PhongGuiImpl()) {}
 
@@ -53,7 +63,7 @@ PhongGui::~PhongGui() = default;
 void PhongGui::initialize(int width, int height, std::string assets_dir)
 {
     Gui::setViewport(width, height);
-    Gui::initialize(width, height, assets_dir);
+    /* Gui::initialize(width, height, assets_dir); */
 
     auto gui = Gui::getTucanoGui();
     auto scene_pimpl = Gui::getSceneImpl();

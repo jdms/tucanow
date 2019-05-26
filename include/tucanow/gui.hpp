@@ -27,9 +27,9 @@ class Gui
 {
     public: 
         /**
-         * @brief Constructor implements the pimpl idiom
+         * @brief Factory method
          */
-        Gui(Scene&);
+        static std::unique_ptr<tucanow::Gui> Get(Scene &s);
 
         /**
          * @brief Default destructor
@@ -56,17 +56,6 @@ class Gui
          * @brief Default move assignment
          */
         Gui& operator=(Gui&&);
-
-        /**
-         * @brief Initialize the gui and shaders
-         *
-         * Must be called after Glew has been initialized
-         *
-         * @param width Viewport width 
-         * @param height Viewport height 
-         * @param assets_dir Path to dir where gui's assets can be found
-         */
-        virtual void initialize(int width, int height, std::string assets_dir = "./samples/assets/");
 
         /**
          * @brief Set gui's scene viewport
@@ -134,6 +123,14 @@ class Gui
          * @return Pointer to Tucano::GUI::Base
          */
         SceneImpl* getSceneImpl();
+
+        /**
+         * @brief Constructor implements the pimpl idiom
+         *
+         * i@param scene Scene 
+         * @param assets_dir Path to dir where gui's assets can be found
+         */
+        Gui(Scene &scene, std::string assets_dir = "./samples/assets/");
 
         std::reference_wrapper<Scene> scene; ///<-- Reference to Scene object
         std::unique_ptr<Tucano::GUI::Base> pimpl; ///<-- Tucano data

@@ -21,15 +21,26 @@ class PhongGui : public Gui
 {
     public: 
         /**
-         * @brief Constructor implements the pimpl idiom
+         * @brief Factory method
          */
-        PhongGui(Scene&);
+        static std::unique_ptr<tucanow::Gui> Get(Scene &s, std::string assets_dir = "./samples/assets/");
 
         /**
          * @brief Default destructor
          */
         virtual ~PhongGui();
 
+
+    protected:
+        /**
+         * @brief Constructor implements the pimpl idiom
+         */
+        PhongGui(Scene&);
+
+        struct PhongGuiImpl;
+        std::unique_ptr<PhongGuiImpl> pimpl; ///<-- Tucano data
+
+    private:
         /**
          * @brief Initialize the gui and shaders
          *
@@ -39,12 +50,8 @@ class PhongGui : public Gui
          * @param height Viewport height 
          * @param assets_dir Path to dir where gui's assets can be found
          */
-        virtual void initialize(int width, int height, std::string assets_dir = "./samples/assets/") override;
+        void initialize(int width, int height, std::string assets_dir = "./samples/assets/");
 
-
-    protected:
-        struct PhongGuiImpl;
-        std::unique_ptr<PhongGuiImpl> pimpl; ///<-- Tucano data
 };
 
 
