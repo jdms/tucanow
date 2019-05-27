@@ -417,14 +417,24 @@ void Scene::resetCamera()
     pimpl->light.reset();
 }
 
-void Scene::increaseCameraZoom()
+void Scene::increaseCameraZoom(float zoom_factor)
 {
-        pimpl->camera.increaseZoom(1.05);
+    if ( zoom_factor <= 1.0f )
+    {
+        zoom_factor = 1.03f;
+    }
+
+    pimpl->camera.increaseZoom(zoom_factor);
 }
 
-void Scene::decreaseCameraZoom()
+void Scene::decreaseCameraZoom(float zoom_factor)
 {
-        pimpl->camera.increaseZoom(1.0/1.05);
+    if ( zoom_factor <= 1.0f )
+    {
+        zoom_factor = 1.03f;
+    }
+
+    pimpl->camera.increaseZoom(1.0f/zoom_factor);
 }
 
 void Scene::rotateCamera(float xpos, float ypos)

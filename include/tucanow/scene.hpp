@@ -294,12 +294,12 @@ class Scene
         /**
          * @brief Increase zoom level
          */
-        void increaseCameraZoom();
+        void increaseCameraZoom(float zoom_factor = 1.03);
 
         /**
          * @brief Decrease zoom level
          */
-        void decreaseCameraZoom();
+        void decreaseCameraZoom(float zoom_factor = 1.03);
 
         /**
          * @brief Accumulate sequence of increments to rotate camera 
