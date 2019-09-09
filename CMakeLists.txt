@@ -123,10 +123,8 @@ target_link_libraries(tucanow
 
 target_compile_features(tucanow PUBLIC cxx_std_14)
 
-if(GLOG_FOUND)
-    target_compile_options(tucanow PUBLIC -DTUCANOW_USE_GLOG)
-    target_link_libraries(tucanow PUBLIC glog::glog)
-endif()
+    target_compile_options(tucanow PRIVATE -DTUCANOW_USE_GLOG)
+    target_link_libraries(tucanow PRIVATE glog::glog)
 
 # MSVC (as recently as version 19.15.26729) throws hundreds of warnings from
 # it's own implementation of the STL -- CMake's SYSTEM directive seems
