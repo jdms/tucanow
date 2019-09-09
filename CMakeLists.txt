@@ -71,16 +71,16 @@ endif(TUCANOW_BUILD_DOCS)
 
 find_package(OpenGL REQUIRED)
 
-if(WIN32)
-    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/win32-libs")
+# if(WIN32)
+    # add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/win32-libs")
 
-else()
+# else()
     # GLEW is required by Tucano
     find_package(GLEW REQUIRED)
 
     # Eigen3 is required by Tucano
     find_package(Eigen3 REQUIRED)
-endif()
+# endif()
 
 
 
