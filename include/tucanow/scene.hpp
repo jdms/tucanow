@@ -4,6 +4,7 @@
 /** @file scene.hpp tucanow/scene.hpp
  * */
 
+#include "tucanow/definitions.hpp"
 
 #include<memory>
 #include<string>
@@ -198,7 +199,7 @@ class Scene
                 );
 
         /**
-         * @brief Open a Ply mesh file
+         * @brief Load a Ply mesh file
          *
          * @param object_id Object index (integer valued)
          * @param filename Name of file to open
@@ -208,13 +209,37 @@ class Scene
         bool loadPLY(int object_id, const std::string &filename);
 
         /**
+         * @brief Clear Scene
+         */
+        void clear();
+
+        /**
+         * @brief Erase an object from Scene
+         *
+         * @param object_id Object index (integer valued)
+         *
+         * @return True if an existing object is erased
+         */
+        bool eraseObject(int object_id);
+
+        /**
+         * @brief Set object's shader
+         *
+         * @param object_id Object index (integer valued)
+         * @param shader Shader
+         *
+         * @return True if shader was set successfully
+         */
+        bool setObjectShader(int object_id, const ObjectShader& shader);
+
+        /**
          * @brief Set object's single colour -- does not affect mesh loaded from a ply file
          *
          * @param object_id Object index (integer valued)
          * @param r Intensity of red
          * @param g Intensity of green
          * @param b Intensity of blue
-         * @param a Intensity of alpha (usually opacity)
+         * @param a Intensity of alpha (opacity)
          */
         bool setObjectColor(int object_id, float r, float g, float b, float a = 1.f);
 
@@ -227,7 +252,7 @@ class Scene
          * @param r Intensity of red
          * @param g Intensity of green
          * @param b Intensity of blue
-         * @param a Intensity of alpha (usually opacity)
+         * @param a Intensity of alpha (opacity)
          */
         bool setObjectColor(int object_id, int r, int g, int b, int a = 255);
 

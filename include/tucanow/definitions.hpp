@@ -24,13 +24,21 @@ enum class ObjectShader {
     // Require normals
     OnePassWireframe,
     Toon,
-    // Require normals, and accept textures
+    // Require normals and accept textures
     Phong
 };
 
-enum class SceneLight {
-    SingleDirectional,
-    Headlight
+enum class SceneOptions {
+    SceneLightHeadlight,
+    SceneLightSingleDirectional,
+    SceneLightSingleDirectionalPositiveX,
+    SceneLightSingleDirectionalNegativeX,
+    SceneLightSingleDirectionalPositiveY,
+    SceneLightSingleDirectionalNegativeY,
+    SceneLightSingleDirectionalPositiveZ,
+    SceneLightSingleDirectionalNegativeZ,
+    EnableRenderBoundingBoxBoundary,
+    DisableRenderBoundingBoxBoundary
 };
 
 } // namespace tucanow

@@ -149,13 +149,13 @@ endif()
 add_custom_command(TARGET tucanow POST_BUILD 
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_CURRENT_SOURCE_DIR}/src/tucano/tucano/effects/shaders 
-    ${CMAKE_BINARY_DIR}/shaders
+    ${CMAKE_BINARY_DIR}/${CMAKE_CFG_INTDIR}/shaders
     )
 
 add_custom_command(TARGET tucanow POST_BUILD 
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_CURRENT_SOURCE_DIR}/src/tucano/samples/assets
-    ${CMAKE_BINARY_DIR}/samples/assets
+    ${CMAKE_BINARY_DIR}/${CMAKE_CFG_INTDIR}/samples/assets
     )
 
 

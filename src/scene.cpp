@@ -11,16 +11,7 @@ Scene::Scene() //: pimpl(new SceneImpl)
     // Glew must be initialized before any Tucano object is created
     misc::initGlew();
 
-    pimpl.reset(new SceneImpl);
-
-    /* // Set light cyan as the background colour */
-    /* setClearColor(224, 255, 255, 255); */
-    setClearColor(255, 255, 255, 255);
-
-    Impl().setBBox();
-
-    glEnable(GL_LINE_SMOOTH);
-    glPointSize(2.0f);
+    clear();
 }
 
 Scene::~Scene() = default;
@@ -301,6 +292,38 @@ bool Scene::loadPLY(int object_id, const std::string &filename)
     return success;
 }
 
+bool Scene::eraseObject( int object_id )
+{
+    return Impl().eraseObject(object_id);
+}
+
+void Scene::clear()
+{
+    pimpl.reset(new SceneImpl);
+
+    /* // Set light cyan as the background colour */
+    /* setClearColor(224, 255, 255, 255); */
+    setClearColor(255, 255, 255, 255);
+
+    Impl().setBBox();
+
+    glEnable(GL_LINE_SMOOTH);
+    glPointSize(2.0f);
+}
+
+bool Scene::setObjectShader(int object_id, const ObjectShader& shader)
+{
+    auto object = Impl().Object(object_id);
+    if ( object == nullptr )
+    {
+        return false;
+    }
+
+    object->shader = shader;
+
+    return true;
+}
+
 bool Scene::setObjectColor(int object_id, float r, float g, float b, float a)
 {
     auto object = Impl().Object(object_id);
@@ -308,7 +331,25 @@ bool Scene::setObjectColor(int object_id, float r, float g, float b, float a)
     {
         return false;
     }
+
+    r = (r >= 0.0) ? r : 0.0;
+    r = (r <= 1.0) ? r : 1.0;
+    g = (g >= 0.0) ? g : 0.0;
+    g = (g <= 1.0) ? g : 1.0;
+    b = (b >= 0.0) ? b : 0.0;
+    b = (b <= 1.0) ? b : 1.0;
+    a = (a >= 0.0) ? a : 0.0;
+    a = (a <= 1.0) ? a : 1.0;
     object->mesh.setColor(Eigen::Vector4f(r, g, b, a));
+
+    if (std::fabs(a - 1.0) < 0.001)
+    {
+        object->opaque = true;
+    }
+    else
+    {
+        object->opaque = false;
+    }
 
     return true;
 }
@@ -326,7 +367,13 @@ bool Scene::setObjectColorsRGB(int object_id, const std::vector<float> &colors)
         return false;
     }
 
-    return object->mesh.loadColorsRGB(colors);
+    bool success = object->mesh.loadColorsRGB(colors);
+    if (success)
+    {
+        object->opaque = true;
+    }
+
+    return success;
 }
 
 bool Scene::setObjectColorsRGBA(int object_id, const std::vector<float> &colors)
@@ -337,7 +384,13 @@ bool Scene::setObjectColorsRGBA(int object_id, const std::vector<float> &colors)
         return false;
     }
 
-    return object->mesh.loadColorsRGBA(colors);
+    bool success = object->mesh.loadColorsRGBA(colors);
+    if (success)
+    {
+        object->opaque = false;
+    }
+
+    return success;
 }
 
 bool Scene::setMeshTextureCoordinates(int object_id, const std::vector<float> &texture)
@@ -479,6 +532,7 @@ void Scene::stopTranslateCamera()
 void Scene::focusCameraOnBoundingBox()
 {
     Impl().setBBox();
+    Impl().normalizeAllModelMatrices();
 }
 
 bool Scene::focusCameraOnObject(int object_id)
@@ -491,6 +545,7 @@ bool Scene::focusCameraOnObject(int object_id)
 
     Impl().model_centroid = object->mesh.getCentroid();
     Impl().model_scale = object->mesh.getNormalizationScale();
+    Impl().normalizeAllModelMatrices();
 
     return true;
 }

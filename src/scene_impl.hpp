@@ -36,6 +36,7 @@ struct ObjectDescriptor {
     Tucano::Texture texture;
     ObjectType type;
     ObjectShader shader;
+    bool opaque = true;
 };
 
 struct SceneImpl 
@@ -50,7 +51,7 @@ struct SceneImpl
     std::array<float, 3> bbox_origin = {-1.0f, -1.0f, -1.0f};
 
     /// Bounding box size
-    std::array<float, 3> bbox_size ={2.0f, 2.0f, 2.0f};
+    std::array<float, 3> bbox_size = {2.0f, 2.0f, 2.0f};
 
     /// Bounding box normalization scale (1/max{bbox_size}) -- used to normalize Tucano::Model::ModelMatrix
     float model_scale = 1.0f;
@@ -107,6 +108,18 @@ struct SceneImpl
         objects[object_id] = std::make_unique<ObjectDescriptor>();
 
         return Object(object_id);
+    }
+
+    bool eraseObject( int object_id )
+    {
+        auto it = objects.find(object_id);
+        if (it == objects.end())
+        {
+            return false;
+        }
+
+        objects.erase(it);
+        return true;
     }
 
     void setBBox()
@@ -186,6 +199,24 @@ struct SceneImpl
         return true;
     }
 
+    void normalizeAllModelMatrices()
+    {
+        for (auto& entry : objects)
+        {
+            auto& obj = entry.second;
+            normalizeObjectModelMatrix(obj.get());
+        }
+    }
+
+    void denormalizeAllModelMatrices()
+    {
+        for (auto& entry : objects)
+        {
+            auto& obj = entry.second;
+            denormalizeObjectModelMatrix(obj.get());
+        }
+    }
+
     bool render(ObjectDescriptor *ptr)
     {
         if ( ptr == nullptr )
@@ -193,16 +224,16 @@ struct SceneImpl
             return false;
         }
 
-        normalizeObjectModelMatrix(ptr);
+        /* normalizeObjectModelMatrix(ptr); */
 
         switch(ptr->shader)
         {
-            case ObjectShader::OnePassWireframe:
-                wireframe.render(ptr->mesh, camera, light);
-                break;
-
             case ObjectShader::Phong:
                 phong.render(ptr->mesh, camera, light, ptr->texture);
+                break;
+
+            case ObjectShader::OnePassWireframe:
+                wireframe.render(ptr->mesh, camera, light);
                 break;
 
             case ObjectShader::Toon:
@@ -219,7 +250,7 @@ struct SceneImpl
                 break;
         }
 
-        denormalizeObjectModelMatrix(ptr);
+        /* denormalizeObjectModelMatrix(ptr); */
 
         return true;
     }
