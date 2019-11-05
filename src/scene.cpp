@@ -439,8 +439,8 @@ void Scene::decreaseCameraZoom(float zoom_factor)
 
 void Scene::rotateCamera(float xpos, float ypos)
 {
-    float scaled_xpos = scale_width * xpos;
-    float scaled_ypos = scale_height * ypos;
+    float scaled_xpos = Impl().scale_width * xpos;
+    float scaled_ypos = Impl().scale_height * ypos;
 
     /* std::cout << "\nxpos = " << xpos << "; ypos = " << ypos << "\n"; */
     /* std::cout << "\nscaled_xpos = " << scaled_xpos << "; scaled_ypos = " << scaled_ypos << "\n"; */
@@ -465,8 +465,8 @@ void Scene::stopRotateCamera()
 
 void Scene::translateCamera(float xpos, float ypos)
 {
-    float scaled_xpos = scale_width * xpos;
-    float scaled_ypos = scale_height * ypos;
+    float scaled_xpos = Impl().scale_width * xpos;
+    float scaled_ypos = Impl().scale_height * ypos;
 
     pimpl->camera.translateCamera( Eigen::Vector2f(scaled_xpos, scaled_ypos) );
 }
@@ -497,8 +497,8 @@ bool Scene::focusCameraOnObject(int object_id)
 
 void Scene::rotateLight(float xpos, float ypos)
 {
-    float scaled_xpos = scale_width * xpos;
-    float scaled_ypos = scale_height * ypos;
+    float scaled_xpos = Impl().scale_width * xpos;
+    float scaled_ypos = Impl().scale_height * ypos;
 
     if (!headlight_camera)
     {
@@ -523,8 +523,8 @@ bool Scene::setScreenScale( float swidth, float sheight )
 
     if ( success )
     {
-        scale_width = swidth;
-        scale_height = sheight;
+        Impl().scale_width = swidth;
+        Impl().scale_height = sheight;
     }
 
     return success;
@@ -532,8 +532,8 @@ bool Scene::setScreenScale( float swidth, float sheight )
 
 void Scene::getScreenScale( float& swidth, float& sheight )
 {
-    swidth = scale_width;
-    sheight = scale_height;
+    swidth = Impl().scale_width;
+    sheight = Impl().scale_height;
 }
 
 } // namespace tucanow

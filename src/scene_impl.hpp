@@ -40,6 +40,12 @@ struct ObjectDescriptor {
 
 struct SceneImpl 
 {
+    /// Ratio framebuffer_width/window_width
+    float scale_width = 1.0f; 
+
+    /// Ratio framebuffer_height/window_height
+    float scale_height = 1.0f; 
+
     /// Bounding box origin
     std::array<float, 3> bbox_origin = {-1.0f, -1.0f, -1.0f};
 

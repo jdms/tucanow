@@ -365,7 +365,7 @@ class Scene
         friend class Gui;
 
     private:
-        std::array<float, 3> bbox_origin, bbox_size;
+        /* std::array<float, 3> bbox_origin, bbox_size; */
         bool render_wireframe = false; ///<-- Controls whether wireframe or default rendering is used
 
         bool headlight_camera = true; ///<-- Controls whether a headlight or a fixed light is used
