@@ -69,6 +69,7 @@ endif(TUCANOW_BUILD_DOCS)
 # External libraries
 ###############################################
 
+set(OpenGL_GL_PREFERENCE GLVND)
 find_package(OpenGL REQUIRED)
 
 # if(WIN32)
@@ -116,7 +117,7 @@ target_include_directories(tucanow SYSTEM
 
 target_link_libraries(tucanow 
     PUBLIC
-        OpenGL::GL 
+        OpenGL::OpenGL 
         Eigen3::Eigen
         GLEW::GLEW
         glog::glog
